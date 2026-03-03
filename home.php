@@ -13,7 +13,7 @@ require_once 'config/database.php';
 
 // Fetch categories for filtering
 try {
-    $stmt = $pdo->prepare("SELECT * FROM Categories ORDER BY name");
+    $stmt = $pdo->prepare("SELECT * FROM categories ORDER BY name");
     $stmt->execute();
     $categories = $stmt->fetchAll();
 } catch (PDOException $e) {
@@ -44,7 +44,7 @@ try {
     $query = "
       SELECT p.*, c.name as category_name, s.fullname as seller_name, s.address as seller_location, s.seller_id, 'regular' as product_type
       FROM products p
-      JOIN Categories c ON p.category_id = c.category_id
+      JOIN categories c ON p.category_id = c.category_id
       JOIN sellers s ON p.seller_id = s.seller_id
       WHERE p.status = 'active'
     ";
@@ -743,7 +743,7 @@ include 'homeheader.php';
           <!-- Copyright -->
           <div class="row justify-content-center mt-4">
             <div class="col-md-6 text-center">
-             <p>© 2024 DMMMSU Environmental Concerns, Sustainability and Development Unit. All rights reserved.</p>
+             <p> 2024 DMMMSU Environmental Concerns, Sustainability and Development Unit. All rights reserved.</p>
             </div>
           </div>
         </div>
