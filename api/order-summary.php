@@ -17,8 +17,8 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type']) && $_SESSION['u
     $buyer_id = $_SESSION['user_id'];
     $stmt = $pdo->prepare('
         SELECT c.cart_id, c.quantity, p.product_id, p.name, p.price
-        FROM Cart c
-        JOIN Products p ON c.product_id = p.product_id
+        FROM cart c
+        JOIN products p ON c.product_id = p.product_id
         WHERE c.buyer_id = ?
     ');
     $stmt->execute([$buyer_id]);
