@@ -17,17 +17,17 @@ if ($startDate && $endDate) {
 	$stmt->bindParam(':endDate', $endDate);
 }
 $stmt->execute();
-$shareOrders = $stmt->fetchAll();
+$shareorders = $stmt->fetchAll();
 
 $totalSales = 0;
-foreach ($shareOrders as $item) {
+foreach ($shareorders as $item) {
 	$totalSales += $item['amount_paid'];
 }
 $bardShare = $totalSales * 0.05;
 $adminShare = $totalSales * 0.10;
 $sellerShare = $totalSales * 0.85;
 
-$transactionCount = count($shareOrders);
+$transactionCount = count($shareorders);
 $totalRevenue = $totalSales;
 $totalExpenses = 0;
 $totalProfit = $totalRevenue - $totalExpenses;
@@ -61,7 +61,7 @@ if ($startDate && $endDate) {
 		$monthLabels[] = $monthName;
 	}
 }
-foreach ($shareOrders as $item) {
+foreach ($shareorders as $item) {
 	$date = $item['created_at'];
 	$monthName = date('F', strtotime($date));
 	if (isset($bardIncomeMonthly[$monthName])) {
@@ -76,7 +76,7 @@ $bardIncomeDaily = [];
 $adminIncomeDaily = [];
 $sellerIncomeDaily = [];
 $dayLabels = [];
-foreach ($shareOrders as $item) {
+foreach ($shareorders as $item) {
 	$day = date('Y-m-d', strtotime($item['created_at']));
 	if (!isset($bardIncomeDaily[$day])) {
 		$bardIncomeDaily[$day] = 0;
@@ -103,7 +103,7 @@ foreach ($shareOrders as $item) {
 			}
 		}
 	</style>
-	<title>Admin Reports</title>
+	<title>Admins Reports</title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -113,7 +113,7 @@ foreach ($shareOrders as $item) {
 	<div class="container mt-4" style="margin-left:300px; max-width:1200px; width:100%;">
 		<div id="full-report-content">
 		<div class="d-flex justify-content-between align-items-center mb-4">
-			<h2 class="fw-bold mb-0">Admin Reports</h2>
+			<h2 class="fw-bold mb-0">Admins Reports</h2>
 			<button class="btn btn-success" onclick="printFullReport()" title="Print Report">
 				<i class="fas fa-print"></i> Print Report
 			</button>
@@ -135,15 +135,15 @@ foreach ($shareOrders as $item) {
 				<table class="table table-bordered table-striped mb-0">
 					<tbody>
 						<tr>
-							<th>Bard Admin Share (5%)</th>
+							<th>Bard Admins Share (5%)</th>
 							<td>₱<?php echo number_format($bardShare, 2); ?></td>
 						</tr>
 						<tr>
-							<th>Admin Share (10%)</th>
+							<th>Admins Share (10%)</th>
 							<td>₱<?php echo number_format($adminShare, 2); ?></td>
 						</tr>
 						<tr>
-							<th>Seller Share (85%)</th>
+							<th>Sellers Share (85%)</th>
 							<td>₱<?php echo number_format($sellerShare, 2); ?></td>
 						</tr>
 						<tr>
@@ -166,8 +166,8 @@ foreach ($shareOrders as $item) {
 						<tr>
 							<th>Month</th>
 							<th>Bard Share</th>
-							<th>Admin Share</th>
-							<th>Seller Share</th>
+							<th>Admins Share</th>
+							<th>Sellers Share</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -188,7 +188,6 @@ foreach ($shareOrders as $item) {
 				<h5 class="card-title mb-0 fw-semibold text-dark">
 					Shares Income (Daily)
 				</h5>
-				</div> <!-- #full-report-content -->
 			</div>
 			<div class="card-body" id="shares-daily-section">
 				<table class="table table-bordered table-striped mb-0">
@@ -196,8 +195,8 @@ foreach ($shareOrders as $item) {
 						<tr>
 							<th>Date</th>
 							<th>Bard Share</th>
-							<th>Admin Share</th>
-							<th>Seller Share</th>
+							<th>Admins Share</th>
+							<th>Sellers Share</th>
 						</tr>
 					</thead>
 					<tbody>
