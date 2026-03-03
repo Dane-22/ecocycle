@@ -13,7 +13,7 @@ $username = $_SESSION['username'];
 $email = getCurrentEmail();
 
 // Get seller info (including phone, address, password)
-$stmt = $pdo->prepare('SELECT * FROM Sellers WHERE seller_id = ?');
+$stmt = $pdo->prepare('SELECT * FROM sellers WHERE seller_id = ?');
 $stmt->execute([$seller_id]);
 $seller = $stmt->fetch();
 if (!$seller) {
@@ -25,7 +25,7 @@ $address = $seller['address'];
 $password = $seller['password']; // Already hashed
 
 // Check if already a buyer (by email or username)
-$stmt = $pdo->prepare('SELECT * FROM Buyers WHERE email = ? OR username = ?');
+$stmt = $pdo->prepare('SELECT * FROM buyers WHERE email = ? OR username = ?');
 $stmt->execute([$email, $username]);
 $buyer = $stmt->fetch();
 
@@ -44,7 +44,7 @@ if ($buyer && !isset($_POST['action'])) {
 $error_message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'create_buyer') {
     try {
-        $stmt = $pdo->prepare('INSERT INTO Buyers (fullname, username, phone_number, email, password, address, status) VALUES (?, ?, ?, ?, ?, ?, "active")');
+        $stmt = $pdo->prepare('INSERT INTO buyers (fullname, username, phone_number, email, password, address, status) VALUES (?, ?, ?, ?, ?, ?, "active")');
         $stmt->execute([
             $fullname,
             $username,
