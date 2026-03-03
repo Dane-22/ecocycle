@@ -14,7 +14,7 @@ require_once 'config/database.php';
 
 // Get seller data from database
 try {
-		$stmt = $pdo->prepare("SELECT * FROM Sellers WHERE seller_id = ?");
+		$stmt = $pdo->prepare("SELECT * FROM sellers WHERE seller_id = ?");
 		$stmt->execute([getCurrentUserId()]);
 		$seller = $stmt->fetch();
 		if (!$seller) {
@@ -55,9 +55,9 @@ try {
 	$stmt = $pdo->prepare("
 		SELECT COUNT(DISTINCT o.order_id) as total_orders, 
 				 SUM(oi.quantity * oi.price) as total_sales
-		FROM Orders o 
-		JOIN Order_Items oi ON o.order_id = oi.order_id 
-		JOIN Products p ON oi.product_id = p.product_id 
+		FROM orders o 
+		JOIN order_items oi ON o.order_id = oi.order_id 
+		JOIN products p ON oi.product_id = p.product_id 
 		WHERE p.seller_id = ? AND o.status != 'cancelled' $date_filter
 	");
 	$stmt->execute($params);
@@ -66,18 +66,18 @@ try {
 	$total_sales = ($order_stats['total_sales'] ?? 0) * 0.95;
 	$stmt = $pdo->prepare("
 		SELECT COUNT(DISTINCT o.buyer_id) as total_buyers
-		FROM Orders o 
-		JOIN Order_Items oi ON o.order_id = oi.order_id 
-		JOIN Products p ON oi.product_id = p.product_id 
+		FROM orders o 
+		JOIN order_items oi ON o.order_id = oi.order_id 
+		JOIN products p ON oi.product_id = p.product_id 
 		WHERE p.seller_id = ? AND o.status != 'cancelled' $date_filter
 	");
 	$stmt->execute($params);
 	$total_buyers = $stmt->fetch()['total_buyers'] ?? 0;
 	$stmt = $pdo->prepare("
 		SELECT SUM(oi.quantity) as sold_products
-		FROM Order_Items oi
-		JOIN Products p ON oi.product_id = p.product_id
-		JOIN Orders o ON oi.order_id = o.order_id
+		FROM order_items oi
+		JOIN products p ON oi.product_id = p.product_id
+		JOIN orders o ON oi.order_id = o.order_id
 		WHERE p.seller_id = ? AND o.status != 'cancelled' $date_filter
 	");
 	$stmt->execute($params);
@@ -88,10 +88,10 @@ try {
 				 b.fullname as buyer_name,
 				 p.name as product_name,
 				 oi.quantity, oi.price
-		FROM Orders o 
-		JOIN Order_Items oi ON o.order_id = oi.order_id 
-		JOIN Products p ON oi.product_id = p.product_id 
-		JOIN Buyers b ON o.buyer_id = b.buyer_id
+		FROM orders o 
+		JOIN order_items oi ON o.order_id = oi.order_id 
+		JOIN products p ON oi.product_id = p.product_id 
+		JOIN buyers b ON o.buyer_id = b.buyer_id
 		WHERE p.seller_id = ? AND o.status != 'cancelled' $date_filter
 		ORDER BY o.created_at DESC
 		LIMIT 5
@@ -100,9 +100,9 @@ try {
 	$recent_orders = $stmt->fetchAll();
 	$stmt = $pdo->prepare("
 			SELECT p.name, p.price, p.image_url, COUNT(oi.order_item_id) as sales_count
-			FROM Products p 
-			LEFT JOIN Order_Items oi ON p.product_id = oi.product_id 
-			LEFT JOIN Orders o ON oi.order_id = o.order_id AND o.status != 'cancelled'
+			FROM products p 
+			LEFT JOIN order_items oi ON p.product_id = oi.product_id 
+			LEFT JOIN orders o ON oi.order_id = o.order_id AND o.status != 'cancelled'
 			WHERE p.seller_id = ? AND p.status = 'active'
 			GROUP BY p.product_id
 			ORDER BY sales_count DESC
@@ -112,7 +112,7 @@ try {
 	$top_products = $stmt->fetchAll();
 	$stmt = $pdo->prepare("
 			SELECT status, COUNT(*) as count
-			FROM Products 
+			FROM products 
 			WHERE seller_id = ?
 			GROUP BY status
 	");
@@ -148,9 +148,9 @@ try {
 		}
 		$stmt = $pdo->prepare("
 			SELECT SUM(oi.quantity * oi.price) as sales
-			FROM Orders o
-			JOIN Order_Items oi ON o.order_id = oi.order_id
-			JOIN Products p ON oi.product_id = p.product_id
+			FROM orders o
+			JOIN order_items oi ON o.order_id = oi.order_id
+			JOIN products p ON oi.product_id = p.product_id
 			WHERE p.seller_id = ? AND o.status != 'cancelled' AND MONTH(o.created_at) = ? AND YEAR(o.created_at) = ? $monthly_date_filter
 		");
 		$stmt->execute($monthly_params);
@@ -168,9 +168,9 @@ try {
 			$date_str = $date->format('Y-m-d');
 			$stmt = $pdo->prepare("
 				SELECT SUM(oi.quantity * oi.price) as sales, COUNT(DISTINCT o.order_id) as orders
-				FROM Orders o
-				JOIN Order_Items oi ON o.order_id = oi.order_id
-				JOIN Products p ON oi.product_id = p.product_id
+				FROM orders o
+				JOIN order_items oi ON o.order_id = oi.order_id
+				JOIN products p ON oi.product_id = p.product_id
 				WHERE p.seller_id = ? AND o.status != 'cancelled' AND DATE(o.created_at) = ?
 			");
 			$stmt->execute([getCurrentUserId(), $date_str]);
@@ -189,9 +189,9 @@ try {
 			$date_str = $date->format('Y-m-d');
 			$stmt = $pdo->prepare("
 				SELECT SUM(oi.quantity * oi.price) as sales, COUNT(DISTINCT o.order_id) as orders
-				FROM Orders o
-				JOIN Order_Items oi ON o.order_id = oi.order_id
-				JOIN Products p ON oi.product_id = p.product_id
+				FROM orders o
+				JOIN order_items oi ON o.order_id = oi.order_id
+				JOIN products p ON oi.product_id = p.product_id
 				WHERE p.seller_id = ? AND o.status != 'cancelled' AND DATE(o.created_at) = ?
 			");
 			$stmt->execute([getCurrentUserId(), $date_str]);
@@ -208,10 +208,10 @@ try {
 	$clients = [];
 	$stmt = $pdo->prepare("
 		SELECT b.buyer_id, b.fullname, b.email, COUNT(DISTINCT o.order_id) as total_orders, SUM(oi.quantity * oi.price) as total_spent
-		FROM Buyers b
-		JOIN Orders o ON b.buyer_id = o.buyer_id
-		JOIN Order_Items oi ON o.order_id = oi.order_id
-		JOIN Products p ON oi.product_id = p.product_id
+		FROM buyers b
+		JOIN orders o ON b.buyer_id = o.buyer_id
+		JOIN order_items oi ON o.order_id = oi.order_id
+		JOIN products p ON oi.product_id = p.product_id
 		WHERE p.seller_id = ? AND o.status != 'cancelled'
 		GROUP BY b.buyer_id, b.fullname, b.email
 		ORDER BY total_spent DESC
@@ -363,7 +363,7 @@ try {
 									<thead class="table-light">
 										<tr>
 											<th>Date</th>
-											<th>Number of Orders</th>
+											<th>Number of orders</th>
 											<th>Sales (₱)</th>
 										</tr>
 									</thead>
@@ -415,7 +415,7 @@ try {
 									</td>
 								</tr>
 								<tr>
-									<td>List of Clients (Buyers)</td>
+									<td>List of Clients (buyers)</td>
 									<td>
 										<div class="table-responsive">
 											<table class="table table-sm table-bordered">
@@ -423,7 +423,7 @@ try {
 													<tr>
 														<th>Name</th>
 														<th>Email</th>
-														<th>Total Orders</th>
+														<th>Total orders</th>
 														<th>Total Spent (₱)</th>
 													</tr>
 												</thead>

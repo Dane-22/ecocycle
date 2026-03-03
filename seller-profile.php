@@ -18,7 +18,7 @@ require_once 'config/database.php';
 
 // Get seller data from database
 try {
-    $stmt = $pdo->prepare("SELECT * FROM Sellers WHERE seller_id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM sellers WHERE seller_id = ?");
     $stmt->execute([getCurrentUserId()]);
     $seller = $stmt->fetch();
     
@@ -34,7 +34,7 @@ try {
 // Get seller's statistics
 try {
     // Get total products
-    $stmt = $pdo->prepare("SELECT COUNT(*) as total_products FROM Products WHERE seller_id = ? AND status = 'active'");
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total_products FROM products WHERE seller_id = ? AND status = 'active'");
     $stmt->execute([getCurrentUserId()]);
     $total_products = $stmt->fetch()['total_products'];
     
@@ -42,9 +42,9 @@ try {
     $stmt = $pdo->prepare("
         SELECT COUNT(DISTINCT o.order_id) as total_orders, 
                SUM(oi.quantity * oi.price) as total_sales
-        FROM Orders o 
-        JOIN Order_Items oi ON o.order_id = oi.order_id 
-        JOIN Products p ON oi.product_id = p.product_id 
+        FROM orders o 
+        JOIN order_items oi ON o.order_id = oi.order_id 
+        JOIN products p ON oi.product_id = p.product_id 
         WHERE p.seller_id = ? AND o.status != 'cancelled'
     ");
     $stmt->execute([getCurrentUserId()]);
@@ -148,13 +148,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $error_message = "Please enter a valid email address.";
             } else {
                 // Check if username is already taken by another seller
-                $stmt = $pdo->prepare("SELECT seller_id FROM Sellers WHERE username = ? AND seller_id != ?");
+                $stmt = $pdo->prepare("SELECT seller_id FROM sellers WHERE username = ? AND seller_id != ?");
                 $stmt->execute([$username, getCurrentUserId()]);
                 if ($stmt->fetch()) {
                     $error_message = "Username is already taken by another user.";
                 } else {
                     // Check if email is already taken by another seller
-                    $stmt = $pdo->prepare("SELECT seller_id FROM Sellers WHERE email = ? AND seller_id != ?");
+                    $stmt = $pdo->prepare("SELECT seller_id FROM sellers WHERE email = ? AND seller_id != ?");
                     $stmt->execute([$email, getCurrentUserId()]);
                     if ($stmt->fetch()) {
                         $error_message = "Email address is already taken by another user.";
@@ -166,10 +166,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         } else {
                         // Ensure gcash_qr column exists; add if missing
                         try {
-                            $colCheck = $pdo->prepare("SHOW COLUMNS FROM Sellers LIKE 'gcash_qr'");
+                            $colCheck = $pdo->prepare("SHOW COLUMNS FROM sellers LIKE 'gcash_qr'");
                             $colCheck->execute();
                             if (!$colCheck->fetch()) {
-                                $pdo->exec("ALTER TABLE Sellers ADD COLUMN gcash_qr VARCHAR(255) DEFAULT NULL");
+                                $pdo->exec("ALTER TABLE sellers ADD COLUMN gcash_qr VARCHAR(255) DEFAULT NULL");
                             }
                         } catch (PDOException $e) {
                             // ignore column creation errors; proceed without gcash_qr
@@ -178,10 +178,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         // Update profile (include gcash_qr if uploaded)
                             try {
                                 if ($gcashQrFilename) {
-                                    $stmt = $pdo->prepare("UPDATE Sellers SET fullname = ?, username = ?, email = ?, phone_number = ?, address = ?, gcash_qr = ? WHERE seller_id = ?");
+                                    $stmt = $pdo->prepare("UPDATE sellers SET fullname = ?, username = ?, email = ?, phone_number = ?, address = ?, gcash_qr = ? WHERE seller_id = ?");
                                     $stmt->execute([$fullname, $username, $email, $phone, $address, $gcashQrFilename, getCurrentUserId()]);
                                 } else {
-                                    $stmt = $pdo->prepare("UPDATE Sellers SET fullname = ?, username = ?, email = ?, phone_number = ?, address = ? WHERE seller_id = ?");
+                                    $stmt = $pdo->prepare("UPDATE sellers SET fullname = ?, username = ?, email = ?, phone_number = ?, address = ? WHERE seller_id = ?");
                                     $stmt->execute([$fullname, $username, $email, $phone, $address, getCurrentUserId()]);
                                 }
                             } catch (PDOException $e) {
@@ -197,7 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         }
                         
                         // Log the profile update activity
-                        $stmt = $pdo->prepare("INSERT INTO Transaction_Logs (user_id, user_type, action, description, ip_address) VALUES (?, 'seller', 'profile_update', ?, ?)");
+                        $stmt = $pdo->prepare("INSERT INTO transaction_logs (user_id, user_type, action, description, ip_address) VALUES (?, 'seller', 'profile_update', ?, ?)");
                         $description = "Profile updated: " . $fullname;
                         $ip_address = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
                         $stmt->execute([getCurrentUserId(), $description, $ip_address]);
@@ -207,7 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         $_SESSION['username'] = $username;
                         $_SESSION['email'] = $email;
                         // Refresh seller data
-                        $stmt = $pdo->prepare("SELECT * FROM Sellers WHERE seller_id = ?");
+                        $stmt = $pdo->prepare("SELECT * FROM sellers WHERE seller_id = ?");
                         $stmt->execute([getCurrentUserId()]);
                         $seller = $stmt->fetch();
                         $success_message = "Profile updated successfully!";
@@ -217,11 +217,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
         // Add approve/reject logic here if needed (but this is not typical for seller-profile.php)
         if ($action === 'approve') {
-            $stmt = $pdo->prepare("UPDATE Sellers SET status = 'approved' WHERE seller_id = ?");
+            $stmt = $pdo->prepare("UPDATE sellers SET status = 'approved' WHERE seller_id = ?");
             $stmt->execute([getCurrentUserId()]);
             $success_message = "Seller approved successfully!";
         } elseif ($action === 'reject') {
-            $stmt = $pdo->prepare("UPDATE Sellers SET status = 'rejected' WHERE seller_id = ?");
+            $stmt = $pdo->prepare("UPDATE sellers SET status = 'rejected' WHERE seller_id = ?");
             $stmt->execute([getCurrentUserId()]);
             $success_message = "Seller rejected successfully!";
         }
@@ -242,7 +242,7 @@ try {
                CONCAT('Added product: ', name) as title,
                created_at as date,
                'fas fa-plus-circle' as icon
-        FROM Products 
+        FROM products 
         WHERE seller_id = ? 
         ORDER BY created_at DESC 
         LIMIT 5
@@ -266,9 +266,9 @@ try {
                    WHEN o.status = 'confirmed' THEN 'fas fa-thumbs-up'
                    ELSE 'fas fa-shopping-cart'
                END as icon
-        FROM Orders o
-        JOIN Order_Items oi ON o.order_id = oi.order_id
-        JOIN Products p ON oi.product_id = p.product_id
+        FROM orders o
+        JOIN order_items oi ON o.order_id = oi.order_id
+        JOIN products p ON oi.product_id = p.product_id
         WHERE p.seller_id = ?
         ORDER BY o.created_at DESC
         LIMIT 5
@@ -282,9 +282,9 @@ try {
                CONCAT('Earned ₱', FORMAT(oi.quantity * oi.price, 2), ' from Order #', o.order_id) as title,
                o.created_at as date,
                'fas fa-coins' as icon
-        FROM Orders o
-        JOIN Order_Items oi ON o.order_id = oi.order_id
-        JOIN Products p ON oi.product_id = p.product_id
+        FROM orders o
+        JOIN order_items oi ON o.order_id = oi.order_id
+        JOIN products p ON oi.product_id = p.product_id
         WHERE p.seller_id = ? AND o.status != 'cancelled'
         ORDER BY o.created_at DESC
         LIMIT 3
@@ -298,7 +298,7 @@ try {
                'Profile updated' as title,
                created_at as date,
                'fas fa-user-edit' as icon
-        FROM Transaction_Logs
+        FROM transaction_logs
         WHERE user_id = ? AND user_type = 'seller' AND action = 'profile_update'
         ORDER BY created_at DESC
         LIMIT 3
@@ -587,13 +587,13 @@ $first_letter = strtoupper(substr($seller['fullname'], 0, 1));
             <div class="col-md-3 col-6">
                 <div class="stat-item">
                     <div class="stat-number"><?php echo $total_orders; ?></div>
-                    <div class="stat-label">Total Orders</div>
+                    <div class="stat-label">Total orders</div>
                 </div>
             </div>
             <div class="col-md-3 col-6">
                 <div class="stat-item">
                     <div class="stat-number"><?php echo $total_products; ?></div>
-                    <div class="stat-label">Products Listed</div>
+                    <div class="stat-label">products Listed</div>
                 </div>
             </div>
             <div class="col-md-3 col-6">

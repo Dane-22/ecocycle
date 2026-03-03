@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['seller_proof_photo']
   
   // Verify that this order_item belongs to this seller
   if ($order_item_id) {
-    $stmt = $pdo->prepare('SELECT oi.order_item_id FROM Order_Items oi JOIN Products p ON oi.product_id = p.product_id WHERE oi.order_item_id = ? AND p.seller_id = ?');
+    $stmt = $pdo->prepare('SELECT oi.order_item_id FROM order_items oi JOIN products p ON oi.product_id = p.product_id WHERE oi.order_item_id = ? AND p.seller_id = ?');
     $stmt->execute([$order_item_id, getCurrentUserId()]);
     
     if ($stmt->fetch()) {
@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['seller_proof_photo']
       
       if ($upload_ok) {
         try {
-          $update = $pdo->prepare('UPDATE Order_Items SET proof_photo = ? WHERE order_item_id = ?');
+          $update = $pdo->prepare('UPDATE order_items SET proof_photo = ? WHERE order_item_id = ?');
           $update->execute([$target_path, $order_item_id]);
           http_response_code(200);
           echo json_encode(['success' => true, 'message' => 'Proof uploaded successfully', 'proof_path' => $target_path]);
@@ -106,8 +106,8 @@ if (
         // Check if this order_item belongs to a product sold by this seller
         $stmt = $pdo->prepare('
             SELECT oi.order_item_id
-            FROM Order_Items oi
-            JOIN Products p ON oi.product_id = p.product_id
+            FROM order_items oi
+            JOIN products p ON oi.product_id = p.product_id
             WHERE oi.order_item_id = ? AND p.seller_id = ?
             LIMIT 1
         ');
@@ -129,7 +129,7 @@ if (
                 }
                 
                 try {
-                  $stmt2 = $pdo->prepare('UPDATE Order_Items SET status = ?, tracking_number = ? WHERE order_item_id = ?');
+                  $stmt2 = $pdo->prepare('UPDATE order_items SET status = ?, tracking_number = ? WHERE order_item_id = ?');
                   $stmt2->execute([$status, $tracking_number, $order_item_id]);
 
                   // Award EcoCoins to seller when order is delivered
@@ -137,9 +137,9 @@ if (
                     // Get product price, quantity, and seller_id
                     $stmt_ecocoin = $pdo->prepare('
                       SELECT oi.quantity, oi.price, p.seller_id, oi.product_id, p.name as product_name, o.order_id
-                      FROM Order_Items oi
-                      JOIN Products p ON oi.product_id = p.product_id
-                      JOIN Orders o ON oi.order_id = o.order_id
+                      FROM order_items oi
+                      JOIN products p ON oi.product_id = p.product_id
+                      JOIN orders o ON oi.order_id = o.order_id
                       WHERE oi.order_item_id = ?
                       LIMIT 1
                     ');
@@ -197,7 +197,7 @@ if (
                   // Insert notification for buyer if status is confirmed, shipped, delivered, or cancelled
                   if (in_array($status, ['confirmed', 'shipped', 'delivered', 'cancelled'])) {
                     // Get order and buyer info
-                    $stmt3 = $pdo->prepare('SELECT o.order_id, o.buyer_id, oi.product_id, p.name as product_name FROM Order_Items oi JOIN Orders o ON oi.order_id = o.order_id JOIN Products p ON oi.product_id = p.product_id WHERE oi.order_item_id = ? LIMIT 1');
+                    $stmt3 = $pdo->prepare('SELECT o.order_id, o.buyer_id, oi.product_id, p.name as product_name FROM order_items oi JOIN orders o ON oi.order_id = o.order_id JOIN products p ON oi.product_id = p.product_id WHERE oi.order_item_id = ? LIMIT 1');
                     $stmt3->execute([$order_item_id]);
                     $orderInfo = $stmt3->fetch();
                     if ($orderInfo) {
@@ -232,7 +232,7 @@ if (
             elseif (isset($input['tracking_number'])) {
                 $tracking_number = trim($input['tracking_number']);
                 try {
-                    $stmt2 = $pdo->prepare('UPDATE Order_Items SET tracking_number = ? WHERE order_item_id = ?');
+                    $stmt2 = $pdo->prepare('UPDATE order_items SET tracking_number = ? WHERE order_item_id = ?');
                     $stmt2->execute([$tracking_number, $order_item_id]);
                     $response = ['success' => true, 'message' => 'Tracking number updated successfully'];
                 } catch (PDOException $e) {
@@ -315,10 +315,10 @@ try {
       oi.status as item_status,
       oi.tracking_number as item_tracking_number,
       oi.proof_photo
-    FROM Orders o
-    JOIN Order_Items oi ON o.order_id = oi.order_id
-    JOIN Products p ON oi.product_id = p.product_id
-    JOIN Buyers b ON o.buyer_id = b.buyer_id
+    FROM orders o
+    JOIN order_items oi ON o.order_id = oi.order_id
+    JOIN products p ON oi.product_id = p.product_id
+    JOIN buyers b ON o.buyer_id = b.buyer_id
     WHERE p.seller_id = ?
     AND oi.status = 'pending'
     AND NOT EXISTS (SELECT 1 FROM order_views ov WHERE ov.order_id = o.order_id AND ov.seller_id = ?)
@@ -364,10 +364,10 @@ try {
       oi.status as item_status,
       oi.tracking_number as item_tracking_number,
       oi.proof_photo
-    FROM Orders o
-    JOIN Order_Items oi ON o.order_id = oi.order_id
-    JOIN Products p ON oi.product_id = p.product_id
-    JOIN Buyers b ON o.buyer_id = b.buyer_id
+    FROM orders o
+    JOIN order_items oi ON o.order_id = oi.order_id
+    JOIN products p ON oi.product_id = p.product_id
+    JOIN buyers b ON o.buyer_id = b.buyer_id
     WHERE p.seller_id = ?
     AND oi.status NOT IN ('cancelled')
     ORDER BY o.created_at DESC
@@ -386,7 +386,7 @@ include 'sellerheader.php';
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Manage Orders - Ecocycle</title>
+    <title>Manage orders - Ecocycle</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -420,7 +420,7 @@ include 'sellerheader.php';
         <div class="col-12 main-content">
           <div class="container-lg mt-3">
             <div class="d-flex justify-content-between align-items-center mb-4">
-              <h3 class="fw-bold mb-0">Manage Orders</h3>
+              <h3 class="fw-bold mb-0">Manage orders</h3>
             </div>
             <!-- Search and Filters -->
             <div class="search-filter-row mb-3" style="display: flex; gap: 1rem; flex-wrap: wrap;">
@@ -440,7 +440,7 @@ include 'sellerheader.php';
               </select>
               <button type="reset" class="btn btn-outline-secondary" id="resetBtn">Reset</button>
             </div>
-            <!-- Orders Table -->
+            <!-- orders Table -->
             <div class="table-responsive">
               <table class="table table-bordered align-middle">
                 <thead class="table-success">

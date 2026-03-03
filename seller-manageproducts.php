@@ -7,8 +7,8 @@ require_once 'config/session_check.php';
 try {
     $stmt = $pdo->prepare('
         SELECT p.*, c.name as category_name 
-        FROM Products p 
-        JOIN Categories c ON p.category_id = c.category_id 
+        FROM products p 
+        JOIN categories c ON p.category_id = c.category_id 
         WHERE p.seller_id = ?
         ORDER BY p.created_at DESC
     ');
@@ -20,7 +20,7 @@ try {
 
 // Fetch categories for the select dropdown
 try {
-    $stmt = $pdo->prepare("SELECT * FROM Categories ORDER BY name");
+    $stmt = $pdo->prepare("SELECT * FROM categories ORDER BY name");
     $stmt->execute();
     $categories = $stmt->fetchAll();
 } catch (PDOException $e) {
@@ -29,7 +29,7 @@ try {
 
 // Fetch seller info
 try {
-    $stmt = $pdo->prepare("SELECT * FROM Sellers WHERE seller_id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM sellers WHERE seller_id = ?");
     $stmt->execute([getCurrentUserId()]);
     $seller = $stmt->fetch();
 } catch (PDOException $e) {
@@ -57,13 +57,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['productName'])) {
     }
 
     // Get category_id
-    $stmt = $pdo->prepare("SELECT category_id FROM Categories WHERE name = ?");
+    $stmt = $pdo->prepare("SELECT category_id FROM categories WHERE name = ?");
     $stmt->execute([$category]);
     $cat = $stmt->fetch();
     $category_id = $cat ? $cat['category_id'] : null;
 
     if ($category_id) {
-        $stmt = $pdo->prepare("INSERT INTO Products (seller_id, category_id, name, description, price, ecocoins_price, stock_quantity, image_url, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO products (seller_id, category_id, name, description, price, ecocoins_price, stock_quantity, image_url, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([getCurrentUserId(), $category_id, $name, $description, $price, $ecocoins_price, $stocks, $image_url, $status]);
         $success_message = "Product submitted successfully! It is now pending admin verification.";
     } else {
@@ -82,14 +82,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['updateProduct'])) {
     $ecocoins_price = intval(round($price)); // Calculate ecocoins price (1 PHP = 1 EcoCoin)
 
     // Get category_id
-    $stmt = $pdo->prepare("SELECT category_id FROM Categories WHERE name = ?");
+    $stmt = $pdo->prepare("SELECT category_id FROM categories WHERE name = ?");
     $stmt->execute([$category]);
     $cat = $stmt->fetch();
     $category_id = $cat ? $cat['category_id'] : null;
 
     if ($category_id) {
         // Fetch current product data
-        $stmt = $pdo->prepare("SELECT * FROM Products WHERE product_id = ? AND seller_id = ?");
+        $stmt = $pdo->prepare("SELECT * FROM products WHERE product_id = ? AND seller_id = ?");
         $stmt->execute([$product_id, getCurrentUserId()]);
         $current = $stmt->fetch();
 
@@ -124,9 +124,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['updateProduct'])) {
         $params[] = getCurrentUserId();
 
         if ($set_pending) {
-            $stmt = $pdo->prepare("UPDATE Products SET category_id = ?, name = ?, description = ?, price = ?, stock_quantity = ?, ecocoins_price = ?$image_update, status = 'pending' WHERE product_id = ? AND seller_id = ?");
+            $stmt = $pdo->prepare("UPDATE products SET category_id = ?, name = ?, description = ?, price = ?, stock_quantity = ?, ecocoins_price = ?$image_update, status = 'pending' WHERE product_id = ? AND seller_id = ?");
         } else {
-            $stmt = $pdo->prepare("UPDATE Products SET category_id = ?, name = ?, description = ?, price = ?, stock_quantity = ?, ecocoins_price = ?$image_update WHERE product_id = ? AND seller_id = ?");
+            $stmt = $pdo->prepare("UPDATE products SET category_id = ?, name = ?, description = ?, price = ?, stock_quantity = ?, ecocoins_price = ?$image_update WHERE product_id = ? AND seller_id = ?");
         }
         $stmt->execute($params);
         $success_message = "Product updated successfully!" . ($set_pending ? " It is now pending admin re-verification." : "");
@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deleteProduct'])) {
     $product_id = $_POST['product_id'];
     
     // Verify the product belongs to the current seller
-    $stmt = $pdo->prepare("DELETE FROM Products WHERE product_id = ? AND seller_id = ?");
+    $stmt = $pdo->prepare("DELETE FROM products WHERE product_id = ? AND seller_id = ?");
     $stmt->execute([$product_id, getCurrentUserId()]);
     $success_message = "Product deleted successfully!";
 }
@@ -153,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['quickUpdate'])) {
     $ecocoins_price = intval(round($price)); // Calculate ecocoins price (1 PHP = 1 EcoCoin)
 
     // Only update price and stocks, do not change status
-    $stmt = $pdo->prepare("UPDATE Products SET price = ?, stock_quantity = ?, ecocoins_price = ? WHERE product_id = ? AND seller_id = ?");
+    $stmt = $pdo->prepare("UPDATE products SET price = ?, stock_quantity = ?, ecocoins_price = ? WHERE product_id = ? AND seller_id = ?");
     $stmt->execute([$price, $stocks, $ecocoins_price, $product_id, getCurrentUserId()]);
     $success_message = "Product price and stocks updated successfully!";
 }
@@ -193,7 +193,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['quickUpdate'])) {
         <div class="col-12 main-content">
           <div class="container-lg mt-3">
             <div class="d-flex justify-content-between align-items-center mb-4">
-              <h3 class="fw-bold mb-0">My Products</h3>
+              <h3 class="fw-bold mb-0">My products</h3>
             </div>
             
 
@@ -208,7 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['quickUpdate'])) {
                 </button>
               </div>
               <select id="filterCategory" class="form-select" style="max-width: 200px;">
-                <option value="">All Categories</option>
+                <option value="">All categories</option>
                 <?php foreach ($categories as $cat): ?>
                   <option value="<?php echo htmlspecialchars($cat['name']); ?>"><?php echo htmlspecialchars($cat['name']); ?></option>
                 <?php endforeach; ?>
