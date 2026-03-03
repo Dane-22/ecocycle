@@ -16,9 +16,9 @@ if (!$token || !in_array($user_type, ['buyer', 'seller'])) {
 } else {
     // FIXED: Use PHP time comparison instead of MySQL NOW()
     if ($user_type == 'buyer') {
-        $stmt = $pdo->prepare("SELECT * FROM Buyers WHERE reset_token = ?");
+        $stmt = $pdo->prepare("SELECT * FROM buyers WHERE reset_token = ?");
     } else {
-        $stmt = $pdo->prepare("SELECT * FROM Sellers WHERE reset_token = ?");
+        $stmt = $pdo->prepare("SELECT * FROM sellers WHERE reset_token = ?");
     }
     
     $stmt->execute([$token]);
@@ -57,11 +57,11 @@ if (!$token || !in_array($user_type, ['buyer', 'seller'])) {
             
             // Update password and clear reset flags
             if ($user_type == 'buyer') {
-                $update_stmt = $pdo->prepare("UPDATE Buyers SET password = ?, reset_token = NULL, 
+                $update_stmt = $pdo->prepare("UPDATE buyers SET password = ?, reset_token = NULL, 
                                              reset_token_expires = NULL, reset_required = 0 
                                              WHERE buyer_id = ?");
             } else {
-                $update_stmt = $pdo->prepare("UPDATE Sellers SET password = ?, reset_token = NULL, 
+                $update_stmt = $pdo->prepare("UPDATE sellers SET password = ?, reset_token = NULL, 
                                              reset_token_expires = NULL, reset_required = 0 
                                              WHERE seller_id = ?");
             }
