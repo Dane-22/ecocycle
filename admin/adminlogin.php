@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error_message = 'Please fill in all required fields.';
     } else {
         try {
-            $stmt = $pdo->prepare("SELECT * FROM Admins WHERE (username = ? OR email = ?) AND status = 'active'");
+            $stmt = $pdo->prepare("SELECT * FROM admins WHERE (username = ? OR email = ?) AND status = 'active'");
             $stmt->execute([$login_identifier, $login_identifier]);
             $admin = $stmt->fetch();
 
@@ -58,12 +58,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 exit();
             } else {
                 // Try bard login
-                $stmt = $pdo->prepare("SELECT * FROM Bard WHERE (username = ? OR email = ?) AND status = 'active'");
+                $stmt = $pdo->prepare("SELECT * FROM bard WHERE (username = ? OR email = ?) AND status = 'active'");
                 $stmt->execute([$login_identifier, $login_identifier]);
                 $bard = $stmt->fetch();
 
                 if ($bard && password_verify($password, $bard['password'])) {
-                    // Bard login successful
+                    // bard login successful
                     $_SESSION['user_id'] = $bard['bard_id'];
                     $_SESSION['username'] = $bard['username'];
                     $_SESSION['fullname'] = $bard['fullname'];
@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $_SESSION['last_activity'] = time();
 
                     // Log successful bard login
-                    error_log("Bard login: User ID " . $bard['bard_id'] . " (" . $bard['username'] . ") logged in at " . date('Y-m-d H:i:s'));
+                    error_log("bard login: User ID " . $bard['bard_id'] . " (" . $bard['username'] . ") logged in at " . date('Y-m-d H:i:s'));
 
                     header('Location: barddashboard.php');
                     exit();
