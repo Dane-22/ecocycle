@@ -52,9 +52,9 @@ function sendPasswordResetEmail($user_email, $user_type) {
     
     // Find user and create/reset token
     if ($user_type == 'buyer') {
-        $stmt = $pdo->prepare("SELECT * FROM Buyers WHERE email = ? LIMIT 1");
+        $stmt = $pdo->prepare("SELECT * FROM buyers WHERE email = ? LIMIT 1");
     } else {
-        $stmt = $pdo->prepare("SELECT * FROM Sellers WHERE email = ? LIMIT 1");
+        $stmt = $pdo->prepare("SELECT * FROM sellers WHERE email = ? LIMIT 1");
     }
     
     $stmt->execute([$user_email]);
@@ -70,10 +70,10 @@ function sendPasswordResetEmail($user_email, $user_type) {
     
     // Update user with reset token
     if ($user_type == 'buyer') {
-        $update = $pdo->prepare("UPDATE Buyers SET reset_token = ?, reset_token_expires = ?, reset_required = 1 WHERE buyer_id = ?");
+        $update = $pdo->prepare("UPDATE buyers SET reset_token = ?, reset_token_expires = ?, reset_required = 1 WHERE buyer_id = ?");
         $update->execute([$token, $expires, $user['buyer_id']]);
     } else {
-        $update = $pdo->prepare("UPDATE Sellers SET reset_token = ?, reset_token_expires = ?, reset_required = 1 WHERE seller_id = ?");
+        $update = $pdo->prepare("UPDATE sellers SET reset_token = ?, reset_token_expires = ?, reset_required = 1 WHERE seller_id = ?");
         $update->execute([$token, $expires, $user['seller_id']]);
     }
     
@@ -190,12 +190,12 @@ if (isset(
     require_once 'config/database.php';
     $buyer_id = $_SESSION['user_id'];
     // Fetch buyer info
-    $stmt = $pdo->prepare("SELECT * FROM Buyers WHERE buyer_id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM buyers WHERE buyer_id = ?");
     $stmt->execute([$buyer_id]);
     $buyer = $stmt->fetch();
     if ($buyer) {
         // Check if already a seller (by email or username)
-        $stmt = $pdo->prepare("SELECT * FROM Sellers WHERE email = ? OR username = ?");
+        $stmt = $pdo->prepare("SELECT * FROM sellers WHERE email = ? OR username = ?");
         $stmt->execute([$buyer['email'], $buyer['username']]);
         $existing_seller = $stmt->fetch();
         if ($existing_seller) {
@@ -211,7 +211,7 @@ if (isset(
             exit();
         } else {
             // Create seller account with same credentials
-            $stmt = $pdo->prepare("INSERT INTO Sellers (fullname, username, phone_number, email, password, address, status) VALUES (?, ?, ?, ?, ?, ?, 'pending')");
+            $stmt = $pdo->prepare("INSERT INTO sellers (fullname, username, phone_number, email, password, address, status) VALUES (?, ?, ?, ?, ?, ?, 'pending')");
             $stmt->execute([
                 $buyer['fullname'],
                 $buyer['username'],
@@ -240,12 +240,12 @@ if (isset($_GET['as']) && $_GET['as'] === 'buyer' && isset($_SESSION['user_id'])
     require_once 'config/database.php';
     $seller_id = $_SESSION['user_id'];
     // Fetch seller info
-    $stmt = $pdo->prepare("SELECT * FROM Sellers WHERE seller_id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM sellers WHERE seller_id = ?");
     $stmt->execute([$seller_id]);
     $seller = $stmt->fetch();
     if ($seller) {
         // Check if already a buyer (by email or username)
-        $stmt = $pdo->prepare("SELECT * FROM Buyers WHERE email = ? OR username = ?");
+        $stmt = $pdo->prepare("SELECT * FROM buyers WHERE email = ? OR username = ?");
         $stmt->execute([$seller['email'], $seller['username']]);
         $existing_buyer = $stmt->fetch();
         if ($existing_buyer) {
@@ -261,7 +261,7 @@ if (isset($_GET['as']) && $_GET['as'] === 'buyer' && isset($_SESSION['user_id'])
             exit();
         } else {
             // Create buyer account with same credentials
-            $stmt = $pdo->prepare("INSERT INTO Buyers (fullname, username, phone_number, email, password, address, status) VALUES (?, ?, ?, ?, ?, ?, 'active')");
+            $stmt = $pdo->prepare("INSERT INTO buyers (fullname, username, phone_number, email, password, address, status) VALUES (?, ?, ?, ?, ?, ?, 'active')");
             $stmt->execute([
                 $seller['fullname'],
                 $seller['username'],
@@ -300,13 +300,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $reset_required = true;
             
             // Try to find user to send reset email
-            $stmt = $pdo->prepare("SELECT email FROM Buyers WHERE username = ? OR email = ? OR phone_number = ? UNION SELECT email FROM Sellers WHERE username = ? OR email = ? OR phone_number = ?");
+            $stmt = $pdo->prepare("SELECT email FROM buyers WHERE username = ? OR email = ? OR phone_number = ? UNION SELECT email FROM sellers WHERE username = ? OR email = ? OR phone_number = ?");
             $stmt->execute([$login_identifier, $login_identifier, $login_identifier, $login_identifier, $login_identifier, $login_identifier]);
             $user = $stmt->fetch();
             
             if ($user) {
                 // Determine user type for reset link
-                $stmt = $pdo->prepare("SELECT 'buyer' as type FROM Buyers WHERE email = ? UNION SELECT 'seller' as type FROM Sellers WHERE email = ?");
+                $stmt = $pdo->prepare("SELECT 'buyer' as type FROM buyers WHERE email = ? UNION SELECT 'seller' as type FROM sellers WHERE email = ?");
                 $stmt->execute([$user['email'], $user['email']]);
                 $type_result = $stmt->fetch();
                 $user_type = $type_result ? $type_result['type'] : 'buyer';
@@ -324,14 +324,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // If user has a preferred type, try that first
             if ($preferred_user_type === 'seller') {
               // Try seller first (case sensitive)
-              $stmt = $pdo->prepare("SELECT * FROM Sellers WHERE BINARY username = ? OR BINARY email = ? OR phone_number = ?");
+              $stmt = $pdo->prepare("SELECT * FROM sellers WHERE BINARY username = ? OR BINARY email = ? OR phone_number = ?");
               $stmt->execute([$login_identifier, $login_identifier, $login_identifier]);
               $user = $stmt->fetch();
               if ($user && password_verify($password, $user['password'])) {
                 $user_type = 'seller';
               } else {
                 // Try buyer as fallback (case sensitive)
-                $stmt = $pdo->prepare("SELECT * FROM Buyers WHERE BINARY username = ? OR BINARY email = ? OR phone_number = ?");
+                $stmt = $pdo->prepare("SELECT * FROM buyers WHERE BINARY username = ? OR BINARY email = ? OR phone_number = ?");
                 $stmt->execute([$login_identifier, $login_identifier, $login_identifier]);
                 $user = $stmt->fetch();
                 if ($user && password_verify($password, $user['password'])) {
@@ -342,14 +342,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               }
             } elseif ($preferred_user_type === 'buyer') {
               // Try buyer first (case sensitive)
-              $stmt = $pdo->prepare("SELECT * FROM Buyers WHERE BINARY username = ? OR BINARY email = ? OR phone_number = ?");
+              $stmt = $pdo->prepare("SELECT * FROM buyers WHERE BINARY username = ? OR BINARY email = ? OR phone_number = ?");
               $stmt->execute([$login_identifier, $login_identifier, $login_identifier]);
               $user = $stmt->fetch();
               if ($user && password_verify($password, $user['password'])) {
                 $user_type = 'buyer';
               } else {
                 // Try seller as fallback (case sensitive)
-                $stmt = $pdo->prepare("SELECT * FROM Sellers WHERE BINARY username = ? OR BINARY email = ? OR phone_number = ?");
+                $stmt = $pdo->prepare("SELECT * FROM sellers WHERE BINARY username = ? OR BINARY email = ? OR phone_number = ?");
                 $stmt->execute([$login_identifier, $login_identifier, $login_identifier]);
                 $user = $stmt->fetch();
                 if ($user && password_verify($password, $user['password'])) {
@@ -360,15 +360,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               }
             } else {
               // No preference, try buyer first (original logic, case sensitive)
-              $stmt = $pdo->prepare("SELECT * FROM Buyers WHERE BINARY username = ? OR BINARY email = ? OR phone_number = ?");
+              $stmt = $pdo->prepare("SELECT * FROM buyers WHERE BINARY username = ? OR BINARY email = ? OR phone_number = ?");
               $stmt->execute([$login_identifier, $login_identifier, $login_identifier]);
               $user = $stmt->fetch();
               $user_type = '';
               if ($user && password_verify($password, $user['password'])) {
                 $user_type = 'buyer';
               } else {
-                // Try to find user in Sellers table (case sensitive)
-                $stmt = $pdo->prepare("SELECT * FROM Sellers WHERE BINARY username = ? OR BINARY email = ? OR phone_number = ?");
+                // Try to find user in sellers table (case sensitive)
+                $stmt = $pdo->prepare("SELECT * FROM sellers WHERE BINARY username = ? OR BINARY email = ? OR phone_number = ?");
                 $stmt->execute([$login_identifier, $login_identifier, $login_identifier]);
                 $user = $stmt->fetch();
                 if ($user && password_verify($password, $user['password'])) {
@@ -395,7 +395,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $_SESSION['user_type'] = $user_type;
                     $_SESSION['email'] = $user['email'];
                     // Update last_login for buyer
-                    $stmt = $pdo->prepare("UPDATE Buyers SET last_login = NOW() WHERE buyer_id = ?");
+                    $stmt = $pdo->prepare("UPDATE buyers SET last_login = NOW() WHERE buyer_id = ?");
                     $stmt->execute([$user['buyer_id']]);
                     // Set last_user_type cookie
                     setcookie('last_user_type', $user_type, time() + (86400 * 30), "/"); // 30 days
@@ -418,7 +418,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $_SESSION['user_type'] = $user_type;
                     $_SESSION['email'] = $user['email'];
                     // Update last_login for seller
-                    $stmt = $pdo->prepare("UPDATE Sellers SET last_login = NOW() WHERE seller_id = ?");
+                    $stmt = $pdo->prepare("UPDATE sellers SET last_login = NOW() WHERE seller_id = ?");
                     $stmt->execute([$user['seller_id']]);
                     // Set last_user_type cookie
                     setcookie('last_user_type', $user_type, time() + (86400 * 30), "/"); // 30 days
@@ -435,13 +435,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $reset_required = true;
                     
                     // Try to find user to send reset email
-                    $stmt = $pdo->prepare("SELECT email FROM Buyers WHERE username = ? OR email = ? OR phone_number = ? UNION SELECT email FROM Sellers WHERE username = ? OR email = ? OR phone_number = ?");
+                    $stmt = $pdo->prepare("SELECT email FROM buyers WHERE username = ? OR email = ? OR phone_number = ? UNION SELECT email FROM sellers WHERE username = ? OR email = ? OR phone_number = ?");
                     $stmt->execute([$login_identifier, $login_identifier, $login_identifier, $login_identifier, $login_identifier, $login_identifier]);
                     $user = $stmt->fetch();
                     
                     if ($user) {
                         // Determine user type for reset link
-                        $stmt = $pdo->prepare("SELECT 'buyer' as type FROM Buyers WHERE email = ? UNION SELECT 'seller' as type FROM Sellers WHERE email = ?");
+                        $stmt = $pdo->prepare("SELECT 'buyer' as type FROM buyers WHERE email = ? UNION SELECT 'seller' as type FROM sellers WHERE email = ?");
                         $stmt->execute([$user['email'], $user['email']]);
                         $type_result = $stmt->fetch();
                         $user_type = $type_result ? $type_result['type'] : 'buyer';

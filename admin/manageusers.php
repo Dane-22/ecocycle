@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $error_message = "Invalid email address.";
             } else {
                 // Check for duplicate email or username
-                $table = $user_type === 'seller' ? 'Sellers' : 'Buyers';
+                $table = $user_type === 'seller' ? 'sellers' : 'buyers';
                 $stmt = $pdo->prepare("SELECT COUNT(*) FROM $table WHERE email = ? OR username = ?");
                 $stmt->execute([$email, $username]);
                 if ($stmt->fetchColumn() > 0) {
@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
                     // Insert into table
                     if ($user_type === 'buyer') {
-                        $stmt = $pdo->prepare("INSERT INTO Buyers (fullname, username, email, password, phone_number, address, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
+                        $stmt = $pdo->prepare("INSERT INTO buyers (fullname, username, email, password, phone_number, address, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
                         $stmt->execute([$fullname, $username, $email, $hashed_password, $phone_number, $address]);
                                             $success_message = "Buyer added successfully!";
                     echo "<script>
@@ -130,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                       });
                     </script>";
                 } elseif ($user_type === 'seller') {
-                    $stmt = $pdo->prepare("INSERT INTO Sellers (fullname, username, email, password, phone_number, address, status, created_at) VALUES (?, ?, ?, ?, ?, ?, 'pending', NOW())");
+                    $stmt = $pdo->prepare("INSERT INTO sellers (fullname, username, email, password, phone_number, address, status, created_at) VALUES (?, ?, ?, ?, ?, ?, 'pending', NOW())");
                     $stmt->execute([$fullname, $username, $email, $hashed_password, $phone_number, $address]);
                     $success_message = "Seller added successfully! (Status: pending)";
                     echo "<script>
@@ -157,12 +157,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             error_log("Database connection test successful");
             
             // Delete all buyers and sellers
-            $stmt = $pdo->prepare("DELETE FROM Buyers");
+            $stmt = $pdo->prepare("DELETE FROM buyers");
             $stmt->execute();
             $buyers_deleted = $stmt->rowCount();
             error_log("Deleted " . $buyers_deleted . " buyers");
             
-            $stmt = $pdo->prepare("DELETE FROM Sellers");
+            $stmt = $pdo->prepare("DELETE FROM sellers");
             $stmt->execute();
             $sellers_deleted = $stmt->rowCount();
             error_log("Deleted " . $sellers_deleted . " sellers");
@@ -188,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             
             if ($user_type === 'seller') {
                 if ($action === 'approve') {
-                    $stmt = $pdo->prepare("UPDATE Sellers SET status = 'active' WHERE seller_id = ?");
+                    $stmt = $pdo->prepare("UPDATE sellers SET status = 'active' WHERE seller_id = ?");
                     $stmt->execute([$user_id]);
                     // Activate all pending products for this seller
                     $stmt = $pdo->prepare("UPDATE Products SET status = 'active' WHERE seller_id = ? AND status = 'pending'");
@@ -207,7 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                       });
                     </script>";
                 } elseif ($action === 'reject') {
-                    $stmt = $pdo->prepare("UPDATE Sellers SET status = 'rejected' WHERE seller_id = ?");
+                    $stmt = $pdo->prepare("UPDATE sellers SET status = 'rejected' WHERE seller_id = ?");
                     $stmt->execute([$user_id]);
                     $success_message = "Seller rejected successfully!";
                     
@@ -224,7 +224,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     </script>";
                 } elseif ($action === 'delete') {
                     // Delete only the seller account
-                    $stmt = $pdo->prepare("DELETE FROM Sellers WHERE seller_id = ?");
+                    $stmt = $pdo->prepare("DELETE FROM sellers WHERE seller_id = ?");
                     $stmt->execute([$user_id]);
                     $success_message = "Seller deleted successfully!";
                     
@@ -246,12 +246,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         $error_message = "Password cannot be empty.";
                     } else {
                         // Get seller email and name first
-                        $stmt = $pdo->prepare("SELECT email, fullname FROM Sellers WHERE seller_id = ?");
+                        $stmt = $pdo->prepare("SELECT email, fullname FROM sellers WHERE seller_id = ?");
                         $stmt->execute([$user_id]);
                         $seller = $stmt->fetch();
                         
                         $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-                        $stmt = $pdo->prepare("UPDATE Sellers SET password = ? WHERE seller_id = ?");
+                        $stmt = $pdo->prepare("UPDATE sellers SET password = ? WHERE seller_id = ?");
                         $stmt->execute([$hashed_password, $user_id]);
                         
                         // Send email notification with new password
@@ -273,21 +273,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     }
                 } elseif ($action === 'delete_both') {
                     // Delete both buyer and seller accounts
-                    $stmt = $pdo->prepare("SELECT email FROM Sellers WHERE seller_id = ?");
+                    $stmt = $pdo->prepare("SELECT email FROM sellers WHERE seller_id = ?");
                     $stmt->execute([$user_id]);
                     $seller = $stmt->fetch();
                     
                     if ($seller) {
                         // Check if there's a buyer account with the same email
-                        $stmt = $pdo->prepare("SELECT buyer_id FROM Buyers WHERE email = ?");
+                        $stmt = $pdo->prepare("SELECT buyer_id FROM buyers WHERE email = ?");
                         $stmt->execute([$seller['email']]);
                         $buyer = $stmt->fetch();
                         
                         if ($buyer) {
                             // Delete both buyer and seller accounts
-                            $stmt = $pdo->prepare("DELETE FROM Buyers WHERE buyer_id = ?");
+                            $stmt = $pdo->prepare("DELETE FROM buyers WHERE buyer_id = ?");
                             $stmt->execute([$buyer['buyer_id']]);
-                            $stmt = $pdo->prepare("DELETE FROM Sellers WHERE seller_id = ?");
+                            $stmt = $pdo->prepare("DELETE FROM sellers WHERE seller_id = ?");
                             $stmt->execute([$user_id]);
                             $success_message = "Both buyer and seller accounts deleted successfully!";
                             echo "<script>
@@ -302,7 +302,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             </script>";
                         } else {
                             // Delete only seller account
-                            $stmt = $pdo->prepare("DELETE FROM Sellers WHERE seller_id = ?");
+                            $stmt = $pdo->prepare("DELETE FROM sellers WHERE seller_id = ?");
                             $stmt->execute([$user_id]);
                             $success_message = "Seller deleted successfully!";
                             echo "<script>
@@ -338,12 +338,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         $error_message = "Password cannot be empty.";
                     } else {
                         // Get buyer email and name first
-                        $stmt = $pdo->prepare("SELECT email, fullname FROM Buyers WHERE buyer_id = ?");
+                        $stmt = $pdo->prepare("SELECT email, fullname FROM buyers WHERE buyer_id = ?");
                         $stmt->execute([$user_id]);
                         $buyer = $stmt->fetch();
                         
                         $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-                        $stmt = $pdo->prepare("UPDATE Buyers SET password = ? WHERE buyer_id = ?");
+                        $stmt = $pdo->prepare("UPDATE buyers SET password = ? WHERE buyer_id = ?");
                         $stmt->execute([$hashed_password, $user_id]);
                         
                         // Send email notification with new password
@@ -366,12 +366,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 } elseif ($action === 'block') {
                     // Check if status column exists, if not, add it first
                     try {
-                        $stmt = $pdo->prepare("ALTER TABLE Buyers ADD COLUMN IF NOT EXISTS status ENUM('active', 'blocked') DEFAULT 'active'");
+                        $stmt = $pdo->prepare("ALTER TABLE buyers ADD COLUMN IF NOT EXISTS status ENUM('active', 'blocked') DEFAULT 'active'");
                         $stmt->execute();
                     } catch (PDOException $e) {
                         // Column might already exist, continue
                     }
-                    $stmt = $pdo->prepare("UPDATE Buyers SET status = 'blocked' WHERE buyer_id = ?");
+                    $stmt = $pdo->prepare("UPDATE buyers SET status = 'blocked' WHERE buyer_id = ?");
                     $stmt->execute([$user_id]);
                     $success_message = "Buyer blocked successfully!";
                     
@@ -388,7 +388,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     </script>";
                 } elseif ($action === 'delete') {
                     // Delete only the buyer account
-                    $stmt = $pdo->prepare("DELETE FROM Buyers WHERE buyer_id = ?");
+                    $stmt = $pdo->prepare("DELETE FROM buyers WHERE buyer_id = ?");
                     $stmt->execute([$user_id]);
                     $success_message = "Buyer deleted successfully!";
                     
@@ -405,21 +405,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     </script>";
                 } elseif ($action === 'delete_both') {
                     // Delete both buyer and seller accounts
-                    $stmt = $pdo->prepare("SELECT email FROM Buyers WHERE buyer_id = ?");
+                    $stmt = $pdo->prepare("SELECT email FROM buyers WHERE buyer_id = ?");
                     $stmt->execute([$user_id]);
                     $buyer = $stmt->fetch();
                     
                     if ($buyer) {
                         // Check if there's a seller account with the same email
-                        $stmt = $pdo->prepare("SELECT seller_id FROM Sellers WHERE email = ?");
+                        $stmt = $pdo->prepare("SELECT seller_id FROM sellers WHERE email = ?");
                         $stmt->execute([$buyer['email']]);
                         $seller = $stmt->fetch();
                         
                         if ($seller) {
                             // Delete both buyer and seller accounts
-                            $stmt = $pdo->prepare("DELETE FROM Sellers WHERE seller_id = ?");
+                            $stmt = $pdo->prepare("DELETE FROM sellers WHERE seller_id = ?");
                             $stmt->execute([$seller['seller_id']]);
-                            $stmt = $pdo->prepare("DELETE FROM Buyers WHERE buyer_id = ?");
+                            $stmt = $pdo->prepare("DELETE FROM buyers WHERE buyer_id = ?");
                             $stmt->execute([$user_id]);
                             $success_message = "Both buyer and seller accounts deleted successfully!";
                             echo "<script>
@@ -434,7 +434,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             </script>";
                         } else {
                             // Delete only buyer account
-                            $stmt = $pdo->prepare("DELETE FROM Buyers WHERE buyer_id = ?");
+                            $stmt = $pdo->prepare("DELETE FROM buyers WHERE buyer_id = ?");
                             $stmt->execute([$user_id]);
                             $success_message = "Buyer deleted successfully!";
                             echo "<script>
@@ -472,10 +472,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
 // Get all users (buyers and sellers)
 try {
-    // Check if status column exists in Buyers table
+    // Check if status column exists in buyers table
     $statusColumnExists = false;
     try {
-        $stmt = $pdo->prepare("SHOW COLUMNS FROM Buyers LIKE 'status'");
+        $stmt = $pdo->prepare("SHOW COLUMNS FROM buyers LIKE 'status'");
         $stmt->execute();
         $statusColumnExists = $stmt->rowCount() > 0;
     } catch (PDOException $e) {
@@ -488,13 +488,13 @@ try {
         $stmt = $pdo->prepare("
             SELECT buyer_id as id, fullname, username, email, phone_number, address, 'buyer' as user_type, 
                    COALESCE(status, 'active') as status, created_at, NULL as business_docs
-            FROM Buyers
+            FROM buyers
         ");
     } else {
         $stmt = $pdo->prepare("
             SELECT buyer_id as id, fullname, username, email, phone_number, address, 'buyer' as user_type, 
                    'active' as status, created_at, NULL as business_docs
-            FROM Buyers
+            FROM buyers
         ");
     }
     $stmt->execute();
@@ -504,7 +504,7 @@ try {
     $stmt = $pdo->prepare("
         SELECT seller_id as id, fullname, username, email, phone_number, address, 'seller' as user_type, 
                status, created_at, NULL as business_docs
-        FROM Sellers
+        FROM sellers
     ");
     $stmt->execute();
     $sellers = $stmt->fetchAll();
@@ -619,8 +619,8 @@ include 'adminsidebar.php';
       </div>
       <select class="form-select" style="max-width: 180px;" aria-label="Filter by user type" name="filter" id="user-filter">
           <option value=""<?php echo $filter === '' ? ' selected' : ''; ?>>All Users</option>
-          <option value="buyer"<?php echo $filter === 'buyer' ? ' selected' : ''; ?>>Buyers</option>
-          <option value="seller"<?php echo $filter === 'seller' ? ' selected' : ''; ?>>Sellers</option>
+          <option value="buyer"<?php echo $filter === 'buyer' ? ' selected' : ''; ?>>buyers</option>
+          <option value="seller"<?php echo $filter === 'seller' ? ' selected' : ''; ?>>sellers</option>
           <option value="buyer/seller"<?php echo $filter === 'buyer/seller' ? ' selected' : ''; ?>>Buyer/Seller</option>
       </select>
     </form>

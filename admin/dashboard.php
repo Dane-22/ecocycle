@@ -13,37 +13,37 @@ $endDate = isset($_GET['end_date']) ? $_GET['end_date'] : '';
 try {
     // Get users with both buyer and seller accounts
     if ($startDate && $endDate) {
-        $stmt = $pdo->prepare("SELECT COUNT(*) as dual_accounts FROM Buyers b INNER JOIN Sellers s ON b.email = s.email WHERE DATE(b.created_at) >= ? AND DATE(b.created_at) <= ?");
+        $stmt = $pdo->prepare("SELECT COUNT(*) as dual_accounts FROM buyers b INNER JOIN sellers s ON b.email = s.email WHERE DATE(b.created_at) >= ? AND DATE(b.created_at) <= ?");
         $stmt->execute([$startDate, $endDate]);
     } else {
-        $stmt = $pdo->query("SELECT COUNT(*) as dual_accounts FROM Buyers b INNER JOIN Sellers s ON b.email = s.email");
+        $stmt = $pdo->query("SELECT COUNT(*) as dual_accounts FROM buyers b INNER JOIN sellers s ON b.email = s.email");
     }
     $dualAccounts = intval($stmt->fetch()['dual_accounts'] ?? 0);
     
     // Get total buyers
     if ($startDate && $endDate) {
-        $stmt = $pdo->prepare("SELECT COUNT(*) as total_buyers FROM Buyers WHERE DATE(created_at) >= ? AND DATE(created_at) <= ?");
+        $stmt = $pdo->prepare("SELECT COUNT(*) as total_buyers FROM buyers WHERE DATE(created_at) >= ? AND DATE(created_at) <= ?");
         $stmt->execute([$startDate, $endDate]);
     } else {
-        $stmt = $pdo->query("SELECT COUNT(*) as total_buyers FROM Buyers");
+        $stmt = $pdo->query("SELECT COUNT(*) as total_buyers FROM buyers");
     }
-    $totalBuyers = intval($stmt->fetch()['total_buyers'] ?? 0);
+    $totalbuyers = intval($stmt->fetch()['total_buyers'] ?? 0);
     
     // Get total sellers
     if ($startDate && $endDate) {
-        $stmt = $pdo->prepare("SELECT COUNT(*) as total_sellers FROM Sellers WHERE DATE(created_at) >= ? AND DATE(created_at) <= ?");
+        $stmt = $pdo->prepare("SELECT COUNT(*) as total_sellers FROM sellers WHERE DATE(created_at) >= ? AND DATE(created_at) <= ?");
         $stmt->execute([$startDate, $endDate]);
     } else {
-        $stmt = $pdo->query("SELECT COUNT(*) as total_sellers FROM Sellers");
+        $stmt = $pdo->query("SELECT COUNT(*) as total_sellers FROM sellers");
     }
-    $totalSellers = intval($stmt->fetch()['total_sellers'] ?? 0);
+    $totalsellers = intval($stmt->fetch()['total_sellers'] ?? 0);
     
     // Get total admins
     $stmt = $pdo->query("SELECT COUNT(*) as total_admins FROM Admins");
     $totalAdmins = intval($stmt->fetch()['total_admins'] ?? 0);
     
     // Calculate unique users (buyers + sellers - dual accounts to avoid double counting)
-    $totalUsers = $totalBuyers + $totalSellers - $dualAccounts;
+    $totalUsers = $totalbuyers + $totalsellers - $dualAccounts;
     
     // Get pending products for verification
     $stmt = $pdo->query("SELECT COUNT(*) as pending_products FROM Products WHERE status = 'pending'");
@@ -69,7 +69,7 @@ try {
             SELECT o.order_id, o.created_at, o.status, o.total_amount,
                    b.fullname as customer_name
             FROM Orders o 
-            JOIN Buyers b ON o.buyer_id = b.buyer_id
+            JOIN buyers b ON o.buyer_id = b.buyer_id
             WHERE o.status != 'cancelled' AND DATE(o.created_at) >= ? AND DATE(o.created_at) <= ?
             ORDER BY o.created_at DESC
             LIMIT 5
@@ -80,7 +80,7 @@ try {
             SELECT o.order_id, o.created_at, o.status, o.total_amount,
                    b.fullname as customer_name
             FROM Orders o 
-            JOIN Buyers b ON o.buyer_id = b.buyer_id
+            JOIN buyers b ON o.buyer_id = b.buyer_id
             WHERE o.status != 'cancelled'
             ORDER BY o.created_at DESC
             LIMIT 5
@@ -91,8 +91,8 @@ try {
     // Get recent activities (simplified for now)
     $recentActivities = [
         ['type' => 'user', 'message' => 'Total unique users: ' . $totalUsers, 'time' => 'Current'],
-        ['type' => 'buyer', 'message' => 'Buyers only: ' . ($totalBuyers - $dualAccounts), 'time' => 'Current'],
-        ['type' => 'seller', 'message' => 'Sellers only: ' . ($totalSellers - $dualAccounts), 'time' => 'Current'],
+        ['type' => 'buyer', 'message' => 'buyers only: ' . ($totalbuyers - $dualAccounts), 'time' => 'Current'],
+        ['type' => 'seller', 'message' => 'sellers only: ' . ($totalsellers - $dualAccounts), 'time' => 'Current'],
         ['type' => 'dual', 'message' => 'Dual accounts (Buyer/Seller): ' . $dualAccounts, 'time' => 'Current']
     ];
     
@@ -140,9 +140,9 @@ try {
         $stmt = $pdo->prepare("
             SELECT COUNT(*) as count 
             FROM (
-                SELECT created_at FROM Buyers WHERE MONTH(created_at) = :month AND YEAR(created_at) = :year
+                SELECT created_at FROM buyers WHERE MONTH(created_at) = :month AND YEAR(created_at) = :year
                 UNION ALL
-                SELECT created_at FROM Sellers WHERE MONTH(created_at) = :month AND YEAR(created_at) = :year
+                SELECT created_at FROM sellers WHERE MONTH(created_at) = :month AND YEAR(created_at) = :year
             ) as combined
         ");
         $stmt->execute(['month' => $monthNum, 'year' => $year]);
@@ -153,8 +153,8 @@ try {
     // Fallback to default values if database error
     $dualAccounts = 0;
     $totalUsers = 0;
-    $totalBuyers = 0;
-    $totalSellers = 0;
+    $totalbuyers = 0;
+    $totalsellers = 0;
     $totalAdmins = 0;
     $totalSales = 0;
     $pendingProducts = 0;
@@ -454,8 +454,8 @@ try {
                 <div class="stat-icon bg-primary bg-opacity-10 text-primary mb-3">
                   <i class="fas fa-shopping-bag fa-2x"></i>
                 </div>
-                <h6 class="card-title text-muted mb-2 fw-semibold">Buyers Only</h6>
-                <p class="card-text h4 fw-bold text-primary mb-1"><?php echo number_format($totalBuyers - $dualAccounts); ?></p>
+                <h6 class="card-title text-muted mb-2 fw-semibold">buyers Only</h6>
+                <p class="card-text h4 fw-bold text-primary mb-1"><?php echo number_format($totalbuyers - $dualAccounts); ?></p>
                 <small class="text-primary fw-medium">
                   <i class="fas fa-arrow-up me-1"></i>+15% this month
                 </small>
@@ -468,8 +468,8 @@ try {
                 <div class="stat-icon bg-warning bg-opacity-10 text-warning mb-3">
                   <i class="fas fa-store fa-2x"></i>
                 </div>
-                <h6 class="card-title text-muted mb-2 fw-semibold">Sellers Only</h6>
-                <p class="card-text h4 fw-bold text-warning mb-1"><?php echo number_format($totalSellers - $dualAccounts); ?></p>
+                <h6 class="card-title text-muted mb-2 fw-semibold">sellers Only</h6>
+                <p class="card-text h4 fw-bold text-warning mb-1"><?php echo number_format($totalsellers - $dualAccounts); ?></p>
                 <small class="text-warning fw-medium">
                   <i class="fas fa-arrow-up me-1"></i>+8% this month
                 </small>
@@ -564,14 +564,14 @@ try {
       const monthlyData = <?php echo json_encode(array_values($monthlyData)); ?>;
       
       // Calculate buyers and sellers data based on real totals
-      const totalBuyers = <?php echo $totalBuyers; ?>;
-      const totalSellers = <?php echo $totalSellers; ?>;
+      const totalbuyers = <?php echo $totalbuyers; ?>;
+      const totalsellers = <?php echo $totalsellers; ?>;
       const dualAccounts = <?php echo $dualAccounts; ?>;
       const totalUsers = <?php echo $totalUsers; ?>;
       
       // Distribute the monthly data proportionally
-      const buyersOnlyData = monthlyData.map(count => Math.round(count * ((totalBuyers - dualAccounts) / totalUsers)));
-      const sellersOnlyData = monthlyData.map(count => Math.round(count * ((totalSellers - dualAccounts) / totalUsers)));
+      const buyersOnlyData = monthlyData.map(count => Math.round(count * ((totalbuyers - dualAccounts) / totalUsers)));
+      const sellersOnlyData = monthlyData.map(count => Math.round(count * ((totalsellers - dualAccounts) / totalUsers)));
       const dualAccountsData = monthlyData.map(count => Math.round(count * (dualAccounts / totalUsers)));
       
       const userChart = new Chart(userCtx, {
@@ -587,14 +587,14 @@ try {
               borderWidth: 1
             },
             {
-              label: 'Buyers Only',
+              label: 'buyers Only',
               data: buyersOnlyData,
               backgroundColor: 'rgba(250, 166, 26, 0.8)',
               borderColor: '#faa61a',
               borderWidth: 1
             },
             {
-              label: 'Sellers Only',
+              label: 'sellers Only',
               data: sellersOnlyData,
               backgroundColor: 'rgba(231, 76, 60, 0.8)',
               borderColor: '#e74c3c',
@@ -639,11 +639,11 @@ try {
       const pieChart = new Chart(pieCtx, {
         type: 'doughnut',
         data: {
-          labels: ['Buyers Only', 'Sellers Only', 'Buyer/Seller'],
+          labels: ['buyers Only', 'sellers Only', 'Buyer/Seller'],
           datasets: [{
             data: [
-              <?php echo $totalBuyers - $dualAccounts; ?>, 
-              <?php echo $totalSellers - $dualAccounts; ?>, 
+              <?php echo $totalbuyers - $dualAccounts; ?>, 
+              <?php echo $totalsellers - $dualAccounts; ?>, 
               <?php echo $dualAccounts; ?>
             ],
             backgroundColor: [

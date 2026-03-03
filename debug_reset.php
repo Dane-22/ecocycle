@@ -14,7 +14,7 @@ echo 'Current Time: ' . date('Y-m-d H:i:s') . '<br>';
 // Test database insert
 echo '<h3>2. Testing Database Insert</h3>';
 try {
-    $stmt = $pdo->prepare("UPDATE Buyers SET reset_token = ?, reset_token_expires = ? WHERE buyer_id = 2");
+    $stmt = $pdo->prepare("UPDATE buyers SET reset_token = ?, reset_token_expires = ? WHERE buyer_id = 2");
     $stmt->execute([$test_token, $expires]);
     echo '<p style="color: green;">✓ Token saved to database</p>';
 } catch (Exception $e) {
@@ -24,7 +24,7 @@ try {
 // Test database retrieval
 echo '<h3>3. Testing Database Retrieval</h3>';
 try {
-    $stmt = $pdo->prepare("SELECT * FROM Buyers WHERE reset_token = ? AND reset_token_expires > NOW()");
+    $stmt = $pdo->prepare("SELECT * FROM buyers WHERE reset_token = ? AND reset_token_expires > NOW()");
     $stmt->execute([$test_token]);
     $user = $stmt->fetch();
     
@@ -49,7 +49,7 @@ try {
         echo '<p style="color: red;">✗ Token not found or expired</p>';
         
         // Check what's in the database
-        $stmt = $pdo->prepare("SELECT reset_token, reset_token_expires FROM Buyers WHERE buyer_id = 2");
+        $stmt = $pdo->prepare("SELECT reset_token, reset_token_expires FROM buyers WHERE buyer_id = 2");
         $stmt->execute();
         $data = $stmt->fetch();
         echo 'Token in DB: ' . htmlspecialchars($data['reset_token'] ?? 'NULL') . '<br>';
@@ -62,7 +62,7 @@ try {
 // Test the exact query from reset-password.php
 echo '<h3>4. Testing Exact Query</h3>';
 try {
-    $sql = "SELECT * FROM Buyers WHERE reset_token = ? AND reset_token_expires > NOW()";
+    $sql = "SELECT * FROM buyers WHERE reset_token = ? AND reset_token_expires > NOW()";
     echo 'SQL: ' . htmlspecialchars($sql) . '<br>';
     
     $stmt = $pdo->prepare($sql);
@@ -72,8 +72,8 @@ try {
     echo 'Results found: ' . count($results) . '<br>';
     
     // Show all buyers with tokens
-    echo '<h4>All Buyers with Reset Tokens:</h4>';
-    $stmt = $pdo->query("SELECT buyer_id, email, reset_token, reset_token_expires FROM Buyers WHERE reset_token IS NOT NULL");
+    echo '<h4>All buyers with Reset Tokens:</h4>';
+    $stmt = $pdo->query("SELECT buyer_id, email, reset_token, reset_token_expires FROM buyers WHERE reset_token IS NOT NULL");
     while ($row = $stmt->fetch()) {
         echo 'ID: ' . $row['buyer_id'] . ', Email: ' . htmlspecialchars($row['email']) . ', Expires: ' . htmlspecialchars($row['reset_token_expires']) . '<br>';
     }

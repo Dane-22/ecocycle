@@ -64,7 +64,7 @@ function send_reset_via_gmail($to_email, $fullname, $token, $user_type) {
 if (isset($_GET['trigger']) && $_GET['trigger'] == '1' && !empty($_GET['email'])) {
     $emailTo = trim($_GET['email']);
     // Try buyers first
-    $stmt = $pdo->prepare("SELECT buyer_id AS id, fullname FROM Buyers WHERE email = ? LIMIT 1");
+    $stmt = $pdo->prepare("SELECT buyer_id AS id, fullname FROM buyers WHERE email = ? LIMIT 1");
     $stmt->execute([$emailTo]);
     $u = $stmt->fetch();
     $type = '';
@@ -75,7 +75,7 @@ if (isset($_GET['trigger']) && $_GET['trigger'] == '1' && !empty($_GET['email'])
         $fullname = $u['fullname'];
         $idCol = 'buyer_id';
     } else {
-        $stmt = $pdo->prepare("SELECT seller_id AS id, fullname FROM Sellers WHERE email = ? LIMIT 1");
+        $stmt = $pdo->prepare("SELECT seller_id AS id, fullname FROM sellers WHERE email = ? LIMIT 1");
         $stmt->execute([$emailTo]);
         $u = $stmt->fetch();
         if ($u) {
@@ -91,14 +91,14 @@ if (isset($_GET['trigger']) && $_GET['trigger'] == '1' && !empty($_GET['email'])
         $show_form = false;
     } else {
         // Ensure token exists
-        $stmt = $pdo->prepare("SELECT reset_token, reset_token_expires FROM " . ($type === 'buyer' ? 'Buyers' : 'Sellers') . " WHERE {$idCol} = ? LIMIT 1");
+        $stmt = $pdo->prepare("SELECT reset_token, reset_token_expires FROM " . ($type === 'buyer' ? 'buyers' : 'sellers') . " WHERE {$idCol} = ? LIMIT 1");
         $stmt->execute([$id]);
         $row = $stmt->fetch();
         $token = $row && !empty($row['reset_token']) && strtotime($row['reset_token_expires']) > time() ? $row['reset_token'] : null;
         if (!$token) {
             $token = bin2hex(random_bytes(32));
             $expires = date('Y-m-d H:i:s', strtotime('+1 hour'));
-            $update = $pdo->prepare("UPDATE " . ($type === 'buyer' ? 'Buyers' : 'Sellers') . " SET reset_token = ?, reset_token_expires = ?, reset_required = 1 WHERE {$idCol} = ?");
+            $update = $pdo->prepare("UPDATE " . ($type === 'buyer' ? 'buyers' : 'sellers') . " SET reset_token = ?, reset_token_expires = ?, reset_required = 1 WHERE {$idCol} = ?");
             $update->execute([$token, $expires, $id]);
         }
 
@@ -120,9 +120,9 @@ if (isset($_GET['trigger']) && $_GET['trigger'] == '1' && !empty($_GET['email'])
     } else {
         // Find user by email
         if ($user_type == 'buyer') {
-            $stmt = $pdo->prepare("SELECT * FROM Buyers WHERE email = ? LIMIT 1");
+            $stmt = $pdo->prepare("SELECT * FROM buyers WHERE email = ? LIMIT 1");
         } else {
-            $stmt = $pdo->prepare("SELECT * FROM Sellers WHERE email = ? LIMIT 1");
+            $stmt = $pdo->prepare("SELECT * FROM sellers WHERE email = ? LIMIT 1");
         }
         
         $stmt->execute([$email]);
@@ -137,10 +137,10 @@ if (isset($_GET['trigger']) && $_GET['trigger'] == '1' && !empty($_GET['email'])
             $expires = date('Y-m-d H:i:s', strtotime('+1 hour'));
             
             if ($user_type == 'buyer') {
-                $update = $pdo->prepare("UPDATE Buyers SET reset_token = ?, reset_token_expires = ?, reset_required = 1 WHERE buyer_id = ?");
+                $update = $pdo->prepare("UPDATE buyers SET reset_token = ?, reset_token_expires = ?, reset_required = 1 WHERE buyer_id = ?");
                 $update->execute([$token, $expires, $user['buyer_id']]);
             } else {
-                $update = $pdo->prepare("UPDATE Sellers SET reset_token = ?, reset_token_expires = ?, reset_required = 1 WHERE seller_id = ?");
+                $update = $pdo->prepare("UPDATE sellers SET reset_token = ?, reset_token_expires = ?, reset_required = 1 WHERE seller_id = ?");
                 $update->execute([$token, $expires, $user['seller_id']]);
             }
             
@@ -171,9 +171,9 @@ if (isset($_GET['trigger']) && $_GET['trigger'] == '1' && !empty($_GET['email'])
     } else {
     // Check token validity - FIXED: Use PHP time instead of MySQL NOW()
     if ($user_type == 'buyer') {
-        $stmt = $pdo->prepare("SELECT * FROM Buyers WHERE reset_token = ?");
+        $stmt = $pdo->prepare("SELECT * FROM buyers WHERE reset_token = ?");
     } else {
-        $stmt = $pdo->prepare("SELECT * FROM Sellers WHERE reset_token = ?");
+        $stmt = $pdo->prepare("SELECT * FROM sellers WHERE reset_token = ?");
     }
 
     $stmt->execute([$token]);
@@ -210,11 +210,11 @@ if (isset($_GET['trigger']) && $_GET['trigger'] == '1' && !empty($_GET['email'])
             
             // Update password and clear reset flags
             if ($user_type == 'buyer') {
-                $update_stmt = $pdo->prepare("UPDATE Buyers SET password = ?, reset_token = NULL, 
+                $update_stmt = $pdo->prepare("UPDATE buyers SET password = ?, reset_token = NULL, 
                                              reset_token_expires = NULL, reset_required = 0 
                                              WHERE buyer_id = ?");
             } else {
-                $update_stmt = $pdo->prepare("UPDATE Sellers SET password = ?, reset_token = NULL, 
+                $update_stmt = $pdo->prepare("UPDATE sellers SET password = ?, reset_token = NULL, 
                                              reset_token_expires = NULL, reset_required = 0 
                                              WHERE seller_id = ?");
             }

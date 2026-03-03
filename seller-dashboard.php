@@ -13,7 +13,7 @@ require_once 'config/database.php';
 
 // Get seller data from database
 try {
-    $stmt = $pdo->prepare("SELECT * FROM Sellers WHERE seller_id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM sellers WHERE seller_id = ?");
     $stmt->execute([getCurrentUserId()]);
     $seller = $stmt->fetch();
     
@@ -109,7 +109,7 @@ try {
     FROM Orders o 
     JOIN Order_Items oi ON o.order_id = oi.order_id 
     JOIN Products p ON oi.product_id = p.product_id 
-    JOIN Buyers b ON o.buyer_id = b.buyer_id
+    JOIN buyers b ON o.buyer_id = b.buyer_id
     WHERE p.seller_id = ? AND o.status != 'cancelled' $date_filter
     ORDER BY o.created_at DESC
     LIMIT 5
