@@ -22,14 +22,14 @@ $balance = 0;
 
 // Use PDO for both queries
 // Fetch buyer balance
-$stmt = $pdo->prepare('SELECT ecocoins_balance FROM Buyers WHERE email = ? OR username = ? LIMIT 1');
+$stmt = $pdo->prepare('SELECT ecocoins_balance FROM buyers WHERE email = ? OR username = ? LIMIT 1');
 $stmt->execute([$user_email, $user_username]);
 $row = $stmt->fetch();
 if ($row) {
     $balance += (float)$row['ecocoins_balance'];
 }
 // Fetch seller balance
-$stmt = $pdo->prepare('SELECT ecocoins_balance FROM Sellers WHERE email = ? OR username = ? LIMIT 1');
+$stmt = $pdo->prepare('SELECT ecocoins_balance FROM sellers WHERE email = ? OR username = ? LIMIT 1');
 $stmt->execute([$user_email, $user_username]);
 $row = $stmt->fetch();
 if ($row) {
@@ -46,7 +46,7 @@ if ($stmt) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Redeem Products - Ecocycle</title>
+    <title>Redeem products - Ecocycle</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -115,7 +115,7 @@ if ($stmt) {
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="home.php" class="text-decoration-none">Home</a></li>
                             <li class="breadcrumb-item"><a href="ecocoins.php" class="text-decoration-none">EcoCoins</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Redeem Products</li>
+                            <li class="breadcrumb-item active" aria-current="page">Redeem products</li>
                         </ol>
                     </nav>
 
@@ -133,7 +133,7 @@ if ($stmt) {
                             </div>
                         </div>
                         <div style="height: 32px;"></div>
-                    <!-- Products Grid -->
+                    <!-- products Grid -->
                     <div class="row" id="productsGrid">
                         <?php if (count($products) > 0): ?>
                             <?php foreach ($products as $product): ?>
@@ -172,7 +172,7 @@ if ($stmt) {
                             </div>
                         <?php endif; ?>
                     </div>
-                    <!-- End Products Grid -->
+                    <!-- End products Grid -->
 
                     <!-- Redeemed History Section -->
                     <div class="mt-5">
@@ -241,8 +241,8 @@ if ($stmt) {
                         </div>
                     </div>
 
-                    <!-- No Products Found Message -->
-                    <div id="noProductsMessage" class="text-center py-5" style="display: none;">
+                    <!-- No products Found Message -->
+                    <div id="noproductsMessage" class="text-center py-5" style="display: none;">
                         <i class="fas fa-search text-muted mb-3" style="font-size: 3rem;"></i>
                         <h4 class="text-muted">No products found</h4>
                         <p class="text-muted">Try adjusting your filters to see more products.</p>
@@ -318,10 +318,10 @@ if ($stmt) {
         let currentRedeemData = {};
 
         // Filter functionality
-        document.getElementById('categoryFilter').addEventListener('change', filterProducts);
-        document.getElementById('priceFilter').addEventListener('change', filterProducts);
+        document.getElementById('categoryFilter').addEventListener('change', filterproducts);
+        document.getElementById('priceFilter').addEventListener('change', filterproducts);
 
-        function filterProducts() {
+        function filterproducts() {
             const categoryFilter = document.getElementById('categoryFilter').value;
             const priceFilter = document.getElementById('priceFilter').value;
             const products = document.querySelectorAll('.product-card');
@@ -356,11 +356,11 @@ if ($stmt) {
             });
 
             // Show/hide no products message
-            const noProductsMessage = document.getElementById('noProductsMessage');
+            const noproductsMessage = document.getElementById('noproductsMessage');
             if (visibleCount === 0) {
-                noProductsMessage.style.display = 'block';
+                noproductsMessage.style.display = 'block';
             } else {
-                noProductsMessage.style.display = 'none';
+                noproductsMessage.style.display = 'none';
             }
         }
 
