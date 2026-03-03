@@ -15,9 +15,9 @@ require_once 'config/database.php';
 try {
     $stmt = $pdo->prepare("
         SELECT p.*, c.name as category_name, s.fullname as seller_name 
-        FROM Products p 
-        JOIN Categories c ON p.category_id = c.category_id 
-        JOIN Sellers s ON p.seller_id = s.seller_id 
+        FROM products p 
+        JOIN categories c ON p.category_id = c.category_id 
+        JOIN sellers s ON p.seller_id = s.seller_id 
         WHERE p.status = 'active' AND LOWER(c.name) = 'greenchoice'
         ORDER BY p.created_at DESC
     ");
@@ -29,7 +29,7 @@ try {
 
 // Fetch categories for filtering (optional, can be removed if not needed)
 try {
-    $stmt = $pdo->prepare("SELECT * FROM Categories ORDER BY name");
+    $stmt = $pdo->prepare("SELECT * FROM categories ORDER BY name");
     $stmt->execute();
     $categories = $stmt->fetchAll();
 } catch (PDOException $e) {
@@ -43,16 +43,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
     $buyer_id = getCurrentUserId();
     
     try {
-        $stmt = $pdo->prepare("SELECT * FROM Cart WHERE buyer_id = ? AND product_id = ?");
+        $stmt = $pdo->prepare("SELECT * FROM cart WHERE buyer_id = ? AND product_id = ?");
         $stmt->execute([$buyer_id, $product_id]);
         $existing_cart_item = $stmt->fetch();
         
         if ($existing_cart_item) {
             $new_quantity = $existing_cart_item['quantity'] + $quantity;
-            $stmt = $pdo->prepare("UPDATE Cart SET quantity = ? WHERE cart_id = ?");
+            $stmt = $pdo->prepare("UPDATE cart SET quantity = ? WHERE cart_id = ?");
             $stmt->execute([$new_quantity, $existing_cart_item['cart_id']]);
         } else {
-            $stmt = $pdo->prepare("INSERT INTO Cart (buyer_id, product_id, quantity) VALUES (?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO cart (buyer_id, product_id, quantity) VALUES (?, ?, ?)");
             $stmt->execute([$buyer_id, $product_id, $quantity]);
         }
         $success_message = "Product added to cart successfully!";
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
 
 // Get cart count for the current user
 try {
-    $stmt = $pdo->prepare("SELECT COUNT(*) as cart_count FROM Cart WHERE buyer_id = ?");
+    $stmt = $pdo->prepare("SELECT COUNT(*) as cart_count FROM cart WHERE buyer_id = ?");
     $stmt->execute([getCurrentUserId()]);
     $cart_count = $stmt->fetch()['cart_count'];
 } catch (PDOException $e) {
@@ -72,7 +72,7 @@ try {
 
 // Get buyer's order statistics
 try {
-    $stmt = $pdo->prepare("SELECT COUNT(*) as total_orders FROM Orders WHERE buyer_id = ?");
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total_orders FROM orders WHERE buyer_id = ?");
     $stmt->execute([getCurrentUserId()]);
     $total_orders = $stmt->fetch()['total_orders'];
 } catch (PDOException $e) {
@@ -84,7 +84,7 @@ include 'homeheader.php';
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Green Choice Products - Ecocycle NLUC</title>
+    <title>Green Choice products - Ecocycle NLUC</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -357,12 +357,12 @@ include 'homeheader.php';
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
           <?php endif; ?>
-          <div class="container-lg mt-3" id="recyclingProducts">
-            <h3 class="fw-bold mb-4 text-success">Green Choice Products</h3>
+          <div class="container-lg mt-3" id="recyclingproducts">
+            <h3 class="fw-bold mb-4 text-success">Green Choice products</h3>
             <div class="row">
               <?php if (empty($products)): ?>
                 <div class="col-12 text-center">
-                  <img src="images/logo.png.png" alt="No Products" style="width: 100px; opacity: 0.5; margin-bottom: 20px;">
+                  <img src="images/logo.png.png" alt="No products" style="width: 100px; opacity: 0.5; margin-bottom: 20px;">
                   <p class="lead">No Green Choice products available yet.</p>
                 </div>
               <?php else: ?>
@@ -400,7 +400,7 @@ include 'homeheader.php';
                               <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
                               <input type="hidden" name="quantity" value="1">
                               <input type="hidden" name="add_to_cart" value="1">
-                              <button type="submit" class="btn btn-outline-success btn-sm add-to-cart-btn">Add to Cart</button>
+                              <button type="submit" class="btn btn-outline-success btn-sm add-to-cart-btn">Add to cart</button>
                             </form>
                           <?php else: ?>
                             <button class="btn btn-secondary btn-sm" disabled>Out of Stock</button>
@@ -437,7 +437,7 @@ include 'homeheader.php';
             <div id="modalProductPrice"></div>
             <div id="modalProductEcocoinsPrice"></div>
             <div id="modalProductDescription"></div>
-            <button class="btn btn-outline-success add-to-cart-btn w-100 mb-2">Add to Cart</button>
+            <button class="btn btn-outline-success add-to-cart-btn w-100 mb-2">Add to cart</button>
           </div>
         </div>
       </div>
@@ -481,13 +481,13 @@ include 'homeheader.php';
           document.getElementById('modalProductPrice').textContent = price;
           document.getElementById('modalProductEcocoinsPrice').textContent = ecocoinsPrice;
           document.getElementById('modalProductDescription').textContent = description;
-          const modalAddToCartBtn = document.querySelector('#productDetailsModal .add-to-cart-btn');
+          const modalAddTocartBtn = document.querySelector('#productDetailsModal .add-to-cart-btn');
           if (parseInt(stock) > 0) {
-            modalAddToCartBtn.disabled = false;
-            modalAddToCartBtn.textContent = 'Add to Cart';
-            modalAddToCartBtn.classList.remove('btn-secondary');
-            modalAddToCartBtn.classList.add('btn-outline-success');
-            modalAddToCartBtn.onclick = function() {
+            modalAddTocartBtn.disabled = false;
+            modalAddTocartBtn.textContent = 'Add to cart';
+            modalAddTocartBtn.classList.remove('btn-secondary');
+            modalAddTocartBtn.classList.add('btn-outline-success');
+            modalAddTocartBtn.onclick = function() {
               const form = document.createElement('form');
               form.method = 'POST';
               form.innerHTML = `
@@ -499,11 +499,11 @@ include 'homeheader.php';
               form.submit();
             };
           } else {
-            modalAddToCartBtn.disabled = true;
-            modalAddToCartBtn.textContent = 'Out of Stock';
-            modalAddToCartBtn.classList.remove('btn-outline-success');
-            modalAddToCartBtn.classList.add('btn-secondary');
-            modalAddToCartBtn.onclick = null;
+            modalAddTocartBtn.disabled = true;
+            modalAddTocartBtn.textContent = 'Out of Stock';
+            modalAddTocartBtn.classList.remove('btn-outline-success');
+            modalAddTocartBtn.classList.add('btn-secondary');
+            modalAddTocartBtn.onclick = null;
           }
           const productDetailsModal = new bootstrap.Modal(document.getElementById('productDetailsModal'));
           productDetailsModal.show();

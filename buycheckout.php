@@ -34,7 +34,7 @@ if (isset($_SESSION['email'])) {
 if (isset($_SESSION['user_id']) && isset($_SESSION['user_type'])) {
     require_once 'config/database.php';
     if ($_SESSION['user_type'] === 'buyer') {
-        $stmt = $pdo->prepare('SELECT phone_number, address FROM Buyers WHERE buyer_id = ?');
+        $stmt = $pdo->prepare('SELECT phone_number, address FROM buyers WHERE buyer_id = ?');
         $stmt->execute([$_SESSION['user_id']]);
         $row = $stmt->fetch();
         if ($row) {
@@ -42,7 +42,7 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_type'])) {
             $address = $row['address'];
         }
     } elseif ($_SESSION['user_type'] === 'seller') {
-        $stmt = $pdo->prepare('SELECT phone_number, address FROM Sellers WHERE seller_id = ?');
+        $stmt = $pdo->prepare('SELECT phone_number, address FROM sellers WHERE seller_id = ?');
         $stmt->execute([$_SESSION['user_id']]);
         $row = $stmt->fetch();
         if ($row) {
@@ -68,14 +68,14 @@ require_once 'config/database.php';
 $buyer_id = $_SESSION['user_id'];
 
 // Fetch user's EcoCoins balance
-$stmt = $pdo->prepare('SELECT ecocoins_balance FROM Buyers WHERE buyer_id = ?');
+$stmt = $pdo->prepare('SELECT ecocoins_balance FROM buyers WHERE buyer_id = ?');
 $stmt->execute([$buyer_id]);
 $buyer = $stmt->fetch();
 $user_ecocoins_balance = $buyer ? (float)$buyer['ecocoins_balance'] : 0;
 
 $product_id = intval($_POST['product_id']);
 $quantity = max(1, intval($_POST['quantity']));
-$stmt = $pdo->prepare('SELECT p.product_id, p.name, p.price, p.image_url, p.stock_quantity, p.seller_id FROM Products p WHERE p.product_id = ?');
+$stmt = $pdo->prepare('SELECT p.product_id, p.name, p.price, p.image_url, p.stock_quantity, p.seller_id FROM products p WHERE p.product_id = ?');
 $stmt->execute([$product_id]);
 $product = $stmt->fetch();
 if ($product && $product['stock_quantity'] >= $quantity) {
@@ -99,7 +99,7 @@ if ($product && $product['stock_quantity'] >= $quantity) {
 
 $sellerQrs = [];
 if ($order_item && !empty($order_item['seller_id'])) {
-    $stmt = $pdo->prepare('SELECT seller_id, fullname, username, gcash_qr, phone_number FROM Sellers WHERE seller_id = ?');
+    $stmt = $pdo->prepare('SELECT seller_id, fullname, username, gcash_qr, phone_number FROM sellers WHERE seller_id = ?');
     $stmt->execute([$order_item['seller_id']]);
     $sr = $stmt->fetch();
     if ($sr) {
@@ -138,7 +138,7 @@ if ($order_item && !empty($order_item['seller_id'])) {
                     <nav aria-label="breadcrumb" class="mb-4">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="home.php" class="text-decoration-none">Home</a></li>
-                            <li class="breadcrumb-item"><a href="mycart.php" class="text-decoration-none">Cart</a></li>
+                            <li class="breadcrumb-item"><a href="mycart.php" class="text-decoration-none">cart</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Checkout</li>
                         </ol>
                     </nav>
