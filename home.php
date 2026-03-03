@@ -24,8 +24,8 @@ try {
 try {
     $stmt = $pdo->prepare("
         SELECT DISTINCT s.seller_id, s.fullname as seller_name 
-        FROM Sellers s
-        JOIN Products p ON s.seller_id = p.seller_id
+        FROM sellers s
+        JOIN products p ON s.seller_id = p.seller_id
         WHERE p.status = 'active'
         ORDER BY s.fullname
     ");
@@ -43,9 +43,9 @@ $seller_filter = isset($_GET['seller']) ? intval($_GET['seller']) : 0;
 try {
     $query = "
       SELECT p.*, c.name as category_name, s.fullname as seller_name, s.address as seller_location, s.seller_id, 'regular' as product_type
-      FROM Products p
+      FROM products p
       JOIN Categories c ON p.category_id = c.category_id
-      JOIN Sellers s ON p.seller_id = s.seller_id
+      JOIN sellers s ON p.seller_id = s.seller_id
       WHERE p.status = 'active'
     ";
     $params = [];
@@ -118,7 +118,7 @@ try {
 
 // Get buyer's order statistics
 try {
-    $stmt = $pdo->prepare("SELECT COUNT(*) as total_orders FROM Orders WHERE buyer_id = ?");
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total_orders FROM orders WHERE buyer_id = ?");
     $stmt->execute([getCurrentUserId()]);
     $total_orders = $stmt->fetch()['total_orders'];
 } catch (PDOException $e) {
@@ -656,12 +656,12 @@ include 'homeheader.php';
             </div>
           <?php endif; ?>
           
-          <!-- Recycling Products Section -->
-          <div class="container-lg mt-3" id="recyclingProducts">
+          <!-- Recycling products Section -->
+          <div class="container-lg mt-3" id="recyclingproducts">
             <div class="row">
               <?php if (empty($products)): ?>
                 <div class="col-12 text-center">
-                  <img src="images/logo.png.png" alt="No Products" style="width: 100px; opacity: 0.5; margin-bottom: 20px;">
+                  <img src="images/logo.png.png" alt="No products" style="width: 100px; opacity: 0.5; margin-bottom: 20px;">
                   <?php if ($category_filter > 0 || $seller_filter > 0): ?>
                     <p class="lead">No products found matching your filters.</p>
                     <p class="text-muted">Try adjusting your filters or <a href="home.php">clear all filters</a> to see all products.</p>

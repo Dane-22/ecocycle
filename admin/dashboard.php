@@ -39,26 +39,26 @@ try {
     $totalsellers = intval($stmt->fetch()['total_sellers'] ?? 0);
     
     // Get total admins
-    $stmt = $pdo->query("SELECT COUNT(*) as total_admins FROM Admins");
-    $totalAdmins = intval($stmt->fetch()['total_admins'] ?? 0);
+    $stmt = $pdo->query("SELECT COUNT(*) as total_admins FROM admins");
+    $totaladmins = intval($stmt->fetch()['total_admins'] ?? 0);
     
     // Calculate unique users (buyers + sellers - dual accounts to avoid double counting)
     $totalUsers = $totalbuyers + $totalsellers - $dualAccounts;
     
     // Get pending products for verification
-    $stmt = $pdo->query("SELECT COUNT(*) as pending_products FROM Products WHERE status = 'pending'");
-    $pendingProducts = intval($stmt->fetch()['pending_products'] ?? 0);
+    $stmt = $pdo->query("SELECT COUNT(*) as pending_products FROM products WHERE status = 'pending'");
+    $pendingproducts = intval($stmt->fetch()['pending_products'] ?? 0);
     
     // Get seller products pending admin verification (status = 'inactive')
-    $stmt = $pdo->query("SELECT COUNT(*) as pending_seller_products FROM Products WHERE status = 'inactive'");
-    $pendingSellerProducts = intval($stmt->fetch()['pending_seller_products'] ?? 0);
+    $stmt = $pdo->query("SELECT COUNT(*) as pending_seller_products FROM products WHERE status = 'inactive'");
+    $pendingSellerproducts = intval($stmt->fetch()['pending_seller_products'] ?? 0);
     
     // Get total sales
     if ($startDate && $endDate) {
-        $stmt = $pdo->prepare("SELECT SUM(total_amount) as total_sales FROM Orders WHERE status != 'cancelled' AND DATE(created_at) >= ? AND DATE(created_at) <= ?");
+        $stmt = $pdo->prepare("SELECT SUM(total_amount) as total_sales FROM orders WHERE status != 'cancelled' AND DATE(created_at) >= ? AND DATE(created_at) <= ?");
         $stmt->execute([$startDate, $endDate]);
     } else {
-        $stmt = $pdo->query("SELECT SUM(total_amount) as total_sales FROM Orders WHERE status != 'cancelled'");
+        $stmt = $pdo->query("SELECT SUM(total_amount) as total_sales FROM orders WHERE status != 'cancelled'");
     }
     $result = $stmt->fetch();
     $totalSales = floatval($result['total_sales'] ?? 0);
@@ -68,7 +68,7 @@ try {
         $stmt = $pdo->prepare("
             SELECT o.order_id, o.created_at, o.status, o.total_amount,
                    b.fullname as customer_name
-            FROM Orders o 
+            FROM orders o 
             JOIN buyers b ON o.buyer_id = b.buyer_id
             WHERE o.status != 'cancelled' AND DATE(o.created_at) >= ? AND DATE(o.created_at) <= ?
             ORDER BY o.created_at DESC
@@ -79,14 +79,14 @@ try {
         $stmt = $pdo->query("
             SELECT o.order_id, o.created_at, o.status, o.total_amount,
                    b.fullname as customer_name
-            FROM Orders o 
+            FROM orders o 
             JOIN buyers b ON o.buyer_id = b.buyer_id
             WHERE o.status != 'cancelled'
             ORDER BY o.created_at DESC
             LIMIT 5
         ");
     }
-    $recentOrders = $stmt->fetchAll();
+    $recentorders = $stmt->fetchAll();
     
     // Get recent activities (simplified for now)
     $recentActivities = [
@@ -155,11 +155,11 @@ try {
     $totalUsers = 0;
     $totalbuyers = 0;
     $totalsellers = 0;
-    $totalAdmins = 0;
+    $totaladmins = 0;
     $totalSales = 0;
-    $pendingProducts = 0;
-    $pendingSellerProducts = 0;
-    $recentOrders = [];
+    $pendingproducts = 0;
+    $pendingSellerproducts = 0;
+    $recentorders = [];
     $recentActivities = [];
     $monthlyData = [
         'Jan' => 0, 'Feb' => 0, 'Mar' => 0, 'Apr' => 0,
@@ -498,15 +498,15 @@ try {
                 </div>
                 <h6 class="card-title text-muted mb-2 fw-semibold">Pending Verification</h6>
                 <p class="card-text h4 fw-bold text-warning mb-1">
-                  <?php echo number_format($pendingProducts + $pendingSellerProducts); ?>
+                  <?php echo number_format($pendingproducts + $pendingSellerproducts); ?>
                 </p>
                 <small class="text-warning fw-medium">
-                  <i class="fas fa-exclamation-triangle me-1"></i>Products awaiting approval
+                  <i class="fas fa-exclamation-triangle me-1"></i>products awaiting approval
                 </small>
-                <?php if ($pendingProducts > 0): ?>
+                <?php if ($pendingproducts > 0): ?>
                   <div class="mt-3">
                     <a href="manageproducts.php" class="btn btn-warning btn-sm">
-                      <i class="fas fa-eye me-1"></i>Review Products
+                      <i class="fas fa-eye me-1"></i>Review products
                     </a>
                   </div>
                 <?php endif; ?>

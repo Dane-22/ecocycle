@@ -64,9 +64,9 @@ try {
   $stmt = $pdo->prepare("
     SELECT COUNT(DISTINCT o.order_id) as total_orders, 
          SUM(oi.quantity * oi.price) as total_sales
-    FROM Orders o 
+    FROM orders o 
     JOIN Order_Items oi ON o.order_id = oi.order_id 
-    JOIN Products p ON oi.product_id = p.product_id 
+    JOIN products p ON oi.product_id = p.product_id 
     WHERE p.seller_id = ? AND o.status != 'cancelled' $date_filter
   ");
   $stmt->execute($params);
@@ -78,9 +78,9 @@ try {
     // Get total unique buyers
   $stmt = $pdo->prepare("
     SELECT COUNT(DISTINCT o.buyer_id) as total_buyers
-    FROM Orders o 
+    FROM orders o 
     JOIN Order_Items oi ON o.order_id = oi.order_id 
-    JOIN Products p ON oi.product_id = p.product_id 
+    JOIN products p ON oi.product_id = p.product_id 
     WHERE p.seller_id = ? AND o.status != 'cancelled' $date_filter
   ");
   $stmt->execute($params);
@@ -90,8 +90,8 @@ try {
   $stmt = $pdo->prepare("
     SELECT SUM(oi.quantity) as sold_products
     FROM Order_Items oi
-    JOIN Products p ON oi.product_id = p.product_id
-    JOIN Orders o ON oi.order_id = o.order_id
+    JOIN products p ON oi.product_id = p.product_id
+    JOIN orders o ON oi.order_id = o.order_id
     WHERE p.seller_id = ? AND o.status != 'cancelled' $date_filter
   ");
   $stmt->execute($params);
@@ -106,9 +106,9 @@ try {
          b.fullname as buyer_name,
          p.name as product_name,
          oi.quantity, oi.price
-    FROM Orders o 
+    FROM orders o 
     JOIN Order_Items oi ON o.order_id = oi.order_id 
-    JOIN Products p ON oi.product_id = p.product_id 
+    JOIN products p ON oi.product_id = p.product_id 
     JOIN buyers b ON o.buyer_id = b.buyer_id
     WHERE p.seller_id = ? AND o.status != 'cancelled' $date_filter
     ORDER BY o.created_at DESC
@@ -120,9 +120,9 @@ try {
     // Get top selling products
     $stmt = $pdo->prepare("
         SELECT p.name, p.price, p.image_url, COUNT(oi.order_item_id) as sales_count
-        FROM Products p 
+        FROM products p 
         LEFT JOIN Order_Items oi ON p.product_id = oi.product_id 
-        LEFT JOIN Orders o ON oi.order_id = o.order_id AND o.status != 'cancelled'
+        LEFT JOIN orders o ON oi.order_id = o.order_id AND o.status != 'cancelled'
         WHERE p.seller_id = ? AND p.status = 'active'
         GROUP BY p.product_id
         ORDER BY sales_count DESC
@@ -134,7 +134,7 @@ try {
     // Get product verification statistics
     $stmt = $pdo->prepare("
         SELECT status, COUNT(*) as count
-        FROM Products 
+        FROM products 
         WHERE seller_id = ?
         GROUP BY status
     ");
@@ -175,9 +175,9 @@ try {
     }
     $stmt = $pdo->prepare("
       SELECT SUM(oi.quantity * oi.price) as sales
-      FROM Orders o
+      FROM orders o
       JOIN Order_Items oi ON o.order_id = oi.order_id
-      JOIN Products p ON oi.product_id = p.product_id
+      JOIN products p ON oi.product_id = p.product_id
       WHERE p.seller_id = ? AND o.status != 'cancelled' AND MONTH(o.created_at) = ? AND YEAR(o.created_at) = ? $monthly_date_filter
     ");
     $stmt->execute($monthly_params);
@@ -508,7 +508,7 @@ include 'sellerheader.php';
                   <h6 class="alert-heading mb-1">Product Verification Required</h6>
                   <p class="mb-2">You have <strong><?php echo $pending_products; ?> product(s)</strong> pending admin verification. These products will become visible to buyers once approved.</p>
                   <a href="seller-manageproducts.php" class="btn btn-warning btn-sm">
-                    <i class="fas fa-eye me-1"></i>View My Products
+                    <i class="fas fa-eye me-1"></i>View My products
                   </a>
                 </div>
               </div>
@@ -521,10 +521,10 @@ include 'sellerheader.php';
               <div class="d-flex align-items-center">
                 <i class="fas fa-exclamation-triangle me-3" style="font-size: 1.5rem;"></i>
                 <div>
-                  <h6 class="alert-heading mb-1">Products Rejected</h6>
+                  <h6 class="alert-heading mb-1">products Rejected</h6>
                   <p class="mb-2">You have <strong><?php echo $rejected_products; ?> product(s)</strong> that were rejected by admin. Please review and update them for resubmission.</p>
                   <a href="seller-manageproducts.php" class="btn btn-danger btn-sm">
-                    <i class="fas fa-edit me-1"></i>Review Products
+                    <i class="fas fa-edit me-1"></i>Review products
                   </a>
                 </div>
               </div>
@@ -554,7 +554,7 @@ include 'sellerheader.php';
                     <div class="stat-icon bg-primary bg-opacity-10 text-primary mb-3">
                       <i class="fas fa-box fa-2x"></i>
                     </div>
-                    <h6 class="card-title text-muted mb-2 fw-semibold">Sold Products</h6>
+                    <h6 class="card-title text-muted mb-2 fw-semibold">Sold products</h6>
                     <p class="card-text h4 fw-bold text-primary mb-1"><?php echo $sold_products; ?></p>
                     <small class="text-primary fw-medium">
                       <i class="fas fa-arrow-up me-1"></i>Total sold
@@ -596,7 +596,7 @@ include 'sellerheader.php';
                       <div class="stat-icon bg-info bg-opacity-10 text-info mb-3">
                         <i class="fas fa-clock fa-2x"></i>
                       </div>
-                      <h6 class="card-title text-muted mb-2 fw-semibold">Pending Orders</h6>
+                      <h6 class="card-title text-muted mb-2 fw-semibold">Pending orders</h6>
                       <p class="card-text h4 fw-bold text-info mb-1">
                         <?php
                           // Ensure a lightweight table exists to track which orders the seller has viewed
@@ -616,9 +616,9 @@ include 'sellerheader.php';
                           try {
                               $stmt = $pdo->prepare(
                                   "SELECT COUNT(DISTINCT o.order_id) as pending_orders
-                                   FROM Orders o
+                                   FROM orders o
                                    JOIN Order_Items oi ON o.order_id = oi.order_id
-                                   JOIN Products p ON oi.product_id = p.product_id
+                                   JOIN products p ON oi.product_id = p.product_id
                                    WHERE p.seller_id = ? AND oi.status = 'pending'
                                      AND NOT EXISTS (
                                        SELECT 1 FROM order_views ov WHERE ov.order_id = o.order_id AND ov.seller_id = ?
@@ -628,25 +628,25 @@ include 'sellerheader.php';
                               $pending_orders = $stmt->fetch()['pending_orders'] ?? 0;
                           } catch (PDOException $e) {
                               // fallback to previous simple count if the above query fails
-                              $stmt = $pdo->prepare("SELECT COUNT(DISTINCT o.order_id) as pending_orders FROM Orders o JOIN Order_Items oi ON o.order_id = oi.order_id JOIN Products p ON oi.product_id = p.product_id WHERE p.seller_id = ? AND oi.status = 'pending'");
+                              $stmt = $pdo->prepare("SELECT COUNT(DISTINCT o.order_id) as pending_orders FROM orders o JOIN Order_Items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id WHERE p.seller_id = ? AND oi.status = 'pending'");
                               $stmt->execute([getCurrentUserId()]);
                               $pending_orders = $stmt->fetch()['pending_orders'] ?? 0;
                           }
 
-                          // Make the number clickable — opens Manage Orders filtered to unread/pending
+                          // Make the number clickable — opens Manage orders filtered to unread/pending
                           $link = 'seller-manageorders.php?filter=unread';
                           echo '<a href="' . htmlspecialchars($link) . '" class="text-decoration-none text-info">' . intval($pending_orders) . '</a>';
                         ?>
                       </p>
                       <small class="text-info fw-medium">
-                        <i class="fas fa-arrow-up me-1"></i>Orders awaiting action
+                        <i class="fas fa-arrow-up me-1"></i>orders awaiting action
                       </small>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Charts and Recent Orders Row -->
+            <!-- Charts and Recent orders Row -->
             <div class="row mb-4">
               <!-- Sales Chart -->
               <div class="col-lg-8 mb-4">
@@ -674,9 +674,9 @@ include 'sellerheader.php';
                         $productStmt = $pdo->prepare("
                           SELECT p.name, p.stock_quantity,
                             COALESCE(SUM(oi.quantity * oi.price), 0) AS total_sales
-                          FROM Products p
+                          FROM products p
                           LEFT JOIN Order_Items oi ON p.product_id = oi.product_id
-                          LEFT JOIN Orders o ON oi.order_id = o.order_id AND o.status != 'cancelled'
+                          LEFT JOIN orders o ON oi.order_id = o.order_id AND o.status != 'cancelled'
                           WHERE p.seller_id = ?
                           GROUP BY p.product_id
                           ORDER BY total_sales DESC
@@ -709,10 +709,10 @@ include 'sellerheader.php';
 
             <!-- ...existing code... -->
 
-            <!-- Recent Orders and Top Products -->
+            <!-- Recent orders and Top products -->
             <div class="row">
-              <!-- Top Products -->
-              <!-- Removed Top Selling Products section -->
+              <!-- Top products -->
+              <!-- Removed Top Selling products section -->
             </div>
 
             <!-- ...existing code... -->

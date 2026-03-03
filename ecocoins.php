@@ -29,14 +29,14 @@ $user_username = $_SESSION['username'];
 $eco_coins = 0;
 
 // Fetch buyer balance
-$stmt = $pdo->prepare('SELECT ecocoins_balance FROM Buyers WHERE email = ? OR username = ? LIMIT 1');
+$stmt = $pdo->prepare('SELECT ecocoins_balance FROM buyers WHERE email = ? OR username = ? LIMIT 1');
 $stmt->execute([$user_email, $user_username]);
 $row = $stmt->fetch();
 if ($row) {
     $eco_coins += (float)$row['ecocoins_balance'];
 }
 // Fetch seller balance
-$stmt = $pdo->prepare('SELECT ecocoins_balance FROM Sellers WHERE email = ? OR username = ? LIMIT 1');
+$stmt = $pdo->prepare('SELECT ecocoins_balance FROM sellers WHERE email = ? OR username = ? LIMIT 1');
 $stmt->execute([$user_email, $user_username]);
 $row = $stmt->fetch();
 if ($row) {
@@ -134,7 +134,7 @@ $eco_coins_value = $eco_coins / 100;
                                             <i class="fas fa-shopping-bag text-primary me-3" style="font-size: 1.5rem;"></i>
                                         </div>
                                         <div>
-                                            <h6 class="fw-bold">Purchase Eco-Friendly Products</h6>
+                                            <h6 class="fw-bold">Purchase Eco-Friendly products</h6>
                                             <p class="text-muted mb-0">Earn bonus coins when you buy sustainable products from our marketplace.</p>
                                         </div>
                                     </div>
@@ -220,7 +220,7 @@ $eco_coins_value = $eco_coins / 100;
                             <div class="card border-success">
                                 <div class="card-body text-center">
                                     <i class="fas fa-shopping-cart text-success mb-3" style="font-size: 3rem;"></i>
-                                    <h6>Buy Products</h6>
+                                    <h6>Buy products</h6>
                                     <p class="text-muted small">Purchase eco-friendly products</p>
                                     <button class="btn btn-success btn-sm" onclick="window.location.href='home.php'">Shop Now</button>
                                 </div>
@@ -230,7 +230,7 @@ $eco_coins_value = $eco_coins / 100;
                             <div class="card border-primary">
                                 <div class="card-body text-center">
                                     <i class="fas fa-store text-primary mb-3" style="font-size: 3rem;"></i>
-                                    <h6>Sell Products</h6>
+                                    <h6>Sell products</h6>
                                     <p class="text-muted small">List your eco-friendly products</p>
                                     <button class="btn btn-primary btn-sm" onclick="window.location.href='become_seller.php'">Start Selling</button>
                                 </div>
