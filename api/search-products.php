@@ -26,9 +26,9 @@ try {
             c.name as category,
             s.fullname as seller_name,
             s.address as seller_location
-        FROM Products p
-        LEFT JOIN Categories c ON p.category_id = c.category_id
-        LEFT JOIN Sellers s ON p.seller_id = s.seller_id
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.category_id
+        LEFT JOIN sellers s ON p.seller_id = s.seller_id
     WHERE p.status = 'active'
         AND (
             p.name LIKE :search1 
