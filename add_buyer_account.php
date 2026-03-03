@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_type']) || $_SESSION[
 $seller_id = $_SESSION['user_id'];
 
 // Fetch seller info
-$stmt = $pdo->prepare('SELECT * FROM Sellers WHERE seller_id = ?');
+$stmt = $pdo->prepare('SELECT * FROM sellers WHERE seller_id = ?');
 $stmt->execute([$seller_id]);
 $seller = $stmt->fetch();
 
@@ -21,13 +21,13 @@ if (!$seller) {
 }
 
 // Check if buyer account already exists with same email
-$stmt = $pdo->prepare('SELECT * FROM Buyers WHERE email = ?');
+$stmt = $pdo->prepare('SELECT * FROM buyers WHERE email = ?');
 $stmt->execute([$seller['email']]);
 $buyer = $stmt->fetch();
 
 if (!$buyer) {
     // Create buyer account with seller's credentials
-    $stmt = $pdo->prepare('INSERT INTO Buyers (fullname, username, phone_number, email, password, address, status) VALUES (?, ?, ?, ?, ?, ?, "active")');
+    $stmt = $pdo->prepare('INSERT INTO buyers (fullname, username, phone_number, email, password, address, status) VALUES (?, ?, ?, ?, ?, ?, "active")');
     $stmt->execute([
         $seller['fullname'],
         $seller['username'],
@@ -47,7 +47,7 @@ session_destroy();
 session_start();
 
 // Log in as buyer
-$stmt = $pdo->prepare('SELECT * FROM Buyers WHERE buyer_id = ?');
+$stmt = $pdo->prepare('SELECT * FROM buyers WHERE buyer_id = ?');
 $stmt->execute([$buyer_id]);
 $buyer = $stmt->fetch();
 
