@@ -1,0 +1,32 @@
+# Environment Variables - NEVER COMMIT THIS!
+.env
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+debug.log
+admin_security_log.txt
+failed_reset_emails.log
+
+# Temporary files
+tmp/
+temp/
+cache/
+
+# Uploaded files (if not meant to be in repo)
+# Uncomment if uploads should not be committed
+# uploads/
+
+# Backup files
+*.bak
+*.backup

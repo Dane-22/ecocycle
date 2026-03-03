@@ -1,0 +1,607 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+/* Reset & basics */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body, input, button {
+  font-family: 'Poppins', sans-serif;
+  background-color: #28a745; /* Green background for whole body */
+}
+a {
+  text-decoration: none;
+  color: #28a745;
+}
+
+/* Layout */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+header {
+  background: #fff;
+  padding: 1rem 0;
+  border-bottom: 1px solid #eee;
+}
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+.logo img {
+  margin-right: 0.5rem;
+}
+.help {
+  font-size: 0.9rem;
+  color: #999;
+}
+
+/* Main split view */
+main {
+  display: flex;
+  min-height: calc(100vh - 70px);
+}
+.split {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.left {
+  color: #fff;
+  text-align: center;
+  padding: 2rem;
+}
+.brand-logo img {
+  width: 256px;
+  height: 128px;
+  margin-bottom: 1rem;
+}
+
+.left h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+.left p {
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+/* Right card */
+.right {
+  /* No background needed; body handles it */
+}
+.card {
+  background: #fff;
+  padding: 2rem;
+  width: 320px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  text-align: center;
+}
+.card h2 {
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+.card form input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: #fff;
+}
+.btn-next {
+  width: 100%;
+  padding: 0.75rem;
+  background: #28a745; /* Green button */
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.btn-next:hover {
+  background: #218838; /* Darker green on hover */
+}
+
+/* OR divider */
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #ddd;
+}
+.divider::before {
+  margin-right: 0.5em;
+}
+.divider::after {
+  margin-left: 0.5em;
+}
+
+/* Social buttons */
+.social-login {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+.btn-social {
+  flex: 1;
+  padding: 0.6rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  background: #fff;
+}
+
+/* Footer text */
+.footer-text {
+  font-size: 0.75rem;
+  color: #000; /* Change this to black */
+  margin-top: 1rem;
+}
+.footer-text a {
+  color: #000; /* Change this to black as well */
+}
+
+/* Mobile-First Responsive Design */
+@media (max-width: 768px) {
+  /* Mobile layout adjustments */
+  main {
+    flex-direction: column;
+    min-height: calc(100vh - 60px);
+  }
+  
+  .split {
+    flex: none;
+    padding: 1rem;
+  }
+  
+  .left {
+    padding: 1.5rem 1rem;
+    order: 2; /* Move to bottom on mobile */
+  }
+  
+  .right {
+    order: 1; /* Move to top on mobile */
+    padding: 1rem;
+  }
+  
+  /* Mobile card adjustments */
+  .card {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    border-radius: 12px;
+  }
+  
+  /* Mobile typography */
+  .left h1 {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .left p {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  .brand-logo img {
+    width: 200px;
+    height: 100px;
+    margin-bottom: 1rem;
+  }
+  
+  /* Mobile form elements */
+  .card form input {
+    padding: 12px;
+    font-size: 16px; /* Prevents zoom on iOS */
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+  
+  .btn-next {
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    min-height: 48px; /* Touch-friendly height */
+  }
+  
+  /* Mobile social buttons */
+  .social-login {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .btn-social {
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    min-height: 48px;
+  }
+  
+  /* Mobile header */
+  header {
+    padding: 0.75rem 0;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: center;
+  }
+  
+  .logo {
+    font-size: 1.1rem;
+  }
+  
+  .help {
+    font-size: 0.85rem;
+  }
+  
+  /* Mobile divider */
+  .divider {
+    margin: 1.25rem 0;
+    font-size: 0.85rem;
+  }
+  
+  /* Mobile footer text */
+  .footer-text {
+    font-size: 0.8rem;
+    margin-top: 1.25rem;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .card {
+    width: 380px;
+    padding: 2.5rem;
+  }
+  
+  .left h1 {
+    font-size: 2.25rem;
+  }
+  
+  .brand-logo img {
+    width: 220px;
+    height: 110px;
+  }
+}
+
+/* Large mobile devices */
+@media (min-width: 481px) and (max-width: 768px) {
+  .card {
+    padding: 2rem;
+  }
+  
+  .left h1 {
+    font-size: 2.1rem;
+  }
+  
+  .brand-logo img {
+    width: 180px;
+    height: 90px;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .split {
+    padding: 0.75rem;
+  }
+  
+  .left {
+    padding: 1rem 0.75rem;
+  }
+  
+  .right {
+    padding: 0.75rem;
+  }
+  
+  .card {
+    padding: 1.25rem;
+    border-radius: 10px;
+  }
+  
+  .left h1 {
+    font-size: 1.75rem;
+  }
+  
+  .left p {
+    font-size: 0.95rem;
+  }
+  
+  .brand-logo img {
+    width: 160px;
+    height: 80px;
+  }
+  
+  .card form input {
+    padding: 10px;
+    font-size: 16px;
+  }
+  
+  .btn-next {
+    padding: 10px;
+    font-size: 16px;
+  }
+  
+  .btn-social {
+    padding: 10px;
+    font-size: 16px;
+  }
+}
+
+/* Enhanced touch interactions */
+@media (hover: none) and (pointer: coarse) {
+  /* Touch device optimizations */
+  .btn-next:hover {
+    background: #28a745; /* Remove hover effect on touch devices */
+  }
+  
+  .btn-social:hover {
+    background: #fff; /* Remove hover effect on touch devices */
+  }
+  
+  /* Active states for touch */
+  .btn-next:active {
+    background: #218838;
+    transform: scale(0.98);
+  }
+  
+  .btn-social:active {
+    background: #f8f9fa;
+    transform: scale(0.98);
+  }
+  
+  /* Larger touch targets */
+  input, select, textarea {
+    min-height: 44px;
+  }
+  
+  .form-check-input {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .form-check-label {
+    padding-left: 8px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .card {
+    background: #2d3748;
+    color: #e2e8f0;
+  }
+  
+  .card form input {
+    background: #4a5568;
+    border-color: #718096;
+    color: #e2e8f0;
+  }
+  
+  .card form input::placeholder {
+    color: #a0aec0;
+  }
+  
+  .btn-social {
+    background: #4a5568;
+    border-color: #718096;
+    color: #e2e8f0;
+  }
+  
+  .divider {
+    color: #a0aec0;
+  }
+  
+  .divider::before,
+  .divider::after {
+    background: #718096;
+  }
+  
+  .footer-text {
+    color: #e2e8f0;
+  }
+  
+  .footer-text a {
+    color: #e2e8f0;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .card {
+    border: 2px solid #000;
+  }
+  
+  .btn-next {
+    border: 2px solid currentColor;
+  }
+  
+  .btn-social {
+    border: 2px solid #000;
+  }
+  
+  .card form input {
+    border: 2px solid #000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .btn-next:active,
+  .btn-social:active {
+    transform: none;
+  }
+}
+
+/* Landscape orientation on mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  main {
+    flex-direction: row;
+    min-height: calc(100vh - 50px);
+  }
+  
+  .left {
+    order: 1;
+    padding: 1rem;
+  }
+  
+  .right {
+    order: 2;
+    padding: 1rem;
+  }
+  
+  .left h1 {
+    font-size: 1.5rem;
+  }
+  
+  .left p {
+    font-size: 0.9rem;
+  }
+  
+  .brand-logo img {
+    width: 120px;
+    height: 60px;
+  }
+  
+  .card {
+    padding: 1.5rem;
+  }
+}
+
+/* Select Dropdown Container */
+.form-select {
+  position: relative;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+/* Actual Select Element Styling */
+.form-select select {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 0.75rem;
+  font-size: 1rem;
+  color: #495057;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/* Focus State */
+.form-select select:focus {
+  outline: none;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Dropdown Arrow */
+.form-select::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #495057;
+  pointer-events: none;
+}
+
+/* Options Styling */
+.form-select select option {
+  padding: 8px 12px;
+  color: #212529;
+  background-color: #fff;
+}
+
+/* Placeholder Option (disabled) */
+.form-select select option[disabled] {
+  color: #6c757d;
+}
+
+/* Hover State for Options */
+.form-select select option:hover {
+  background-color: #f8f9fa;
+}
+
+/* Selected Option */
+.form-select select option:checked {
+  background-color: #e9ecef;
+  font-weight: normal;
+}
+
+/* Dropdown List Styling (for browsers that support it) */
+.form-select select::-ms-expand {
+  display: none;
+}
+
+/* Mobile responsive adjustments for select */
+@media (max-width: 768px) {
+  .form-select select {
+    padding: 12px 2.5rem 12px 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    min-height: 48px;
+  }
+  
+  .form-select::after {
+    right: 12px;
+  }
+}
+
+/* Dark mode support for select */
+@media (prefers-color-scheme: dark) {
+  .form-select select {
+    background-color: #4a5568;
+    border-color: #718096;
+    color: #e2e8f0;
+  }
+  
+  .form-select select option {
+    background-color: #4a5568;
+    color: #e2e8f0;
+  }
+  
+  .form-select::after {
+    border-top-color: #e2e8f0;
+  }
+}

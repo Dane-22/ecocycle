@@ -1,0 +1,665 @@
+<?php
+// Start session if not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Include session check for sellers
+require_once 'config/session_check.php';
+
+// Check if user is a seller
+if (!isSeller()) {
+    header("Location: login.php");
+    exit();
+}
+
+// Get seller's first letter for avatar
+$first_letter = strtoupper(substr(getCurrentFullname(), 0, 1));
+// Get seller's name and email (fetch from DB or session)
+$seller_name = getCurrentFullname();
+$seller_email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
+
+// Check if seller has a buyer account
+require_once 'config/database.php';
+$has_buyer_account = false;
+
+try {
+    $stmt = $pdo->prepare("SELECT buyer_id FROM Buyers WHERE email = ? OR username = ? LIMIT 1");
+    $stmt->execute([getCurrentEmail(), getCurrentUsername()]);
+    if ($stmt->fetch()) {
+        $has_buyer_account = true;
+    }
+} catch (PDOException $e) {
+    // Optionally log error
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seller Dashboard - Ecocycle</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { 
+      padding-top: 80px; 
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa;
+    }
+    
+    .seller-header {
+      background: linear-gradient(135deg, #1a5f7a 0%, #2c786c 50%, #28bf4b 100%);
+      height: 80px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1100;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .header-content {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 30px;
+    }
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .logo-img {
+      height: 45px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .brand-text {
+      color: white;
+      font-weight: 700;
+      font-size: 1.3rem;
+      margin: 0;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    
+    .brand-subtitle {
+      color: rgba(255,255,255,0.8);
+      font-size: 0.85rem;
+      margin: 0;
+      font-weight: 400;
+    }
+    
+    .header-center {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .page-title {
+      color: white;
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin: 0;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .notification-btn {
+      position: relative;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    
+    .notification-btn:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
+      color: white;
+    }
+    
+    
+    .seller-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 25px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .seller-profile:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
+    }
+    
+    .seller-avatar {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+      background: #28bf4b;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    
+    .seller-info {
+      color: white;
+      text-align: left;
+    }
+    
+    .seller-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin: 0;
+      line-height: 1.2;
+    }
+    
+    .seller-role {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.8);
+      margin: 0;
+      line-height: 1.2;
+    }
+    
+    .dropdown-menu {
+      border: none;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      border-radius: 12px;
+      padding: 8px 0;
+      min-width: 200px;
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.95);
+    }
+    
+    .dropdown-item {
+      padding: 10px 20px;
+      color: #495057;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .dropdown-item:hover {
+      background: #fff;
+      color: #28bf4b;
+      transform: translateX(5px);
+    }
+    
+    .dropdown-item i {
+      width: 16px;
+      opacity: 0.7;
+    }
+    
+    .dropdown-divider {
+      margin: 8px 0;
+      border-color: rgba(0,0,0,0.1);
+    }
+    
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.3);
+      z-index: 2000;
+      display: none;
+      transition: opacity 0.3s;
+    }
+    .sidebar-overlay.active {
+      display: block;
+      opacity: 1;
+    }
+    .sidebar-slide {
+      position: fixed;
+      top: 80px;
+      left: 0;
+      width: 250px;
+      max-width: 90vw;
+      height: calc(100vh - 80px);
+      background: #fff;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+      z-index: 2100;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+      overflow-y: auto;
+      padding: 0;
+      border-right: 1px solid #dee2e6;
+      display: block;
+    }
+    .sidebar-slide.open {
+      transform: translateX(0);
+    }
+    .sidebar-close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #2c786c;
+      z-index: 2200;
+      display: block;
+    }
+    .sidebar-title {
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #2c786c;
+    }
+    .category-item {
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .category-item:hover {
+      background-color: #e9ecef;
+      cursor: pointer;
+    }
+    .price-filter {
+      padding: 15px 0;
+    }
+    .create-listing-btn {
+      background-color: #2c786c;
+      color: white;
+      margin-bottom: 20px;
+      width: 100%;
+      padding: 10px;
+      font-weight: bold;
+    }
+    .create-listing-btn:hover {
+      background-color: #245c54;
+      color: white;
+    }
+    @media (max-width: 576px) {
+      .dropdown-menu {
+        min-width: 140px;
+        font-size: 0.95rem;
+        right: 4px;
+        margin-right: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header class="seller-header">
+  <div class="header-content">
+    <div class="header-left">
+      <div class="logo-section">
+        <button id="menuToggle" class="btn btn-link p-0 me-2" style="font-size:1.5rem;color:white;background:none;border:none;">
+          <i class="fas fa-bars"></i>
+        </button>
+        <img src="images/logo.png.png" alt="Recycling Logo" class="logo-img">
+      </div>
+    </div>
+    
+    <div class="header-center">
+      <div class="page-title">Seller Dashboard</div>
+    </div>
+    <div style="margin-right: 10px;">
+      <button class="notification-btn" id="openNotificationSidebar" title="Notifications" type="button">
+        <i class="fas fa-bell"></i>
+      </button>
+    </div>
+    <div class="header-right">
+      <div class="header-actions">
+        <div class="dropdown position-relative">
+          <div class="seller-profile" id="profileDropdown">
+              <div class="seller-avatar">
+                <?php echo $first_letter; ?>
+              </div>
+              <div class="seller-info">
+                <div class="seller-name"><?php echo htmlspecialchars($seller_name); ?></div>
+                <div class="seller-role">Seller</div>
+              </div>
+          </div>
+         
+          <ul class="dropdown-menu dropdown-menu-end" id="profileDropdownMenu" aria-labelledby="profileDropdown">
+            <li><div class="dropdown-item-text"><strong><?php echo htmlspecialchars($seller_name); ?></strong></div></li>
+            <li><div class="dropdown-item-text text-muted small"><?php echo htmlspecialchars($seller_email); ?></div></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="seller-profile.php"><i class="fas fa-user me-2"></i> Seller Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+<?php if ($has_buyer_account): ?>
+            <li><a class="dropdown-item" href="switch_account.php"><i class="fas fa-retweet me-2"></i> Switch to Buyer</a></li>
+            <li><hr class="dropdown-divider"></li>
+<?php endif; ?>
+            <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i> Log out</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+<!-- Sidebar Overlay and Slide-in Sidebar -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div class="sidebar-slide" id="sidebarSlide">
+  <?php include 'sellersidebar.php'; ?>
+</div>
+
+<!-- Notification Sidebar (right side) -->
+<?php include 'notification_sidebar.html'; ?>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+  .notification-sidebar {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 370px;
+    height: 100vh;
+    background: #fff;
+    box-shadow: -2px 0 16px rgba(0,0,0,0.08);
+    z-index: 3000;
+    transition: right 0.35s cubic-bezier(.4,0,.2,1);
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #e0e0e0;
+    font-family: 'Poppins', sans-serif;
+  }
+  .notification-sidebar.open {
+    right: 0;
+  }
+  .notification-sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 24px 12px 24px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1a5f7a;
+    background: #f8f9fa;
+  }
+  .notification-section-title {
+    padding: 12px 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #28bf4b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: #f0f7f3;
+    border-radius: 8px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+  .notification-sidebar-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px 18px 18px 18px;
+  }
+  .notification-sidebar-item {
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 6px rgba(40,191,75,0.04);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 16px;
+    font-size: 1rem;
+  }
+    .notification-sidebar-item:hover {
+      background: #e6f7ee;
+      box-shadow: 0 2px 12px rgba(40,191,75,0.10);
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+  .notification-sidebar-item:last-child {
+    margin-bottom: 0;
+  }
+  .notification-sidebar-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #e6f7ee;
+    color: #28bf4b;
+  }
+  .notification-sidebar-item.rejected .notification-sidebar-icon {
+    background: #ffeaea;
+    color: #ff4757;
+  }
+  .notification-sidebar-content {
+    flex: 1;
+  }
+  .notification-sidebar-product {
+    font-weight: 600;
+    color: #2c786c;
+    font-size: 1.08rem;
+  }
+  .notification-sidebar-status {
+    font-size: 0.97rem;
+    color: #495057;
+    margin-bottom: 2px;
+  }
+  .notification-sidebar-date {
+    font-size: 0.85rem;
+    color: #888;
+  }
+  .notification-sidebar-badge {
+    font-size: 0.93rem;
+    font-weight: 600;
+    padding: 5px 13px;
+    border-radius: 20px;
+    margin-left: 10px;
+  }
+  .notification-sidebar-badge.approved {
+    background: #28bf4b;
+    color: #fff;
+  }
+  .notification-sidebar-badge.rejected {
+    background: #ff4757;
+    color: #fff;
+  }
+</style>
+<script>
+// Notification Sidebar logic
+document.addEventListener('DOMContentLoaded', function() {
+  const openBtn = document.getElementById('openNotificationSidebar');
+  const sidebar = document.getElementById('notificationSidebar');
+  const closeBtn = document.getElementById('closeNotificationSidebar');
+  const body = document.getElementById('notificationSidebarBody');
+  // Open sidebar
+  if (openBtn && sidebar) {
+    openBtn.addEventListener('click', function() {
+      sidebar.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      
+      // Load approved and delivered products for this seller
+      const body = document.getElementById('notificationSidebarBody');
+      body.innerHTML = '<div class="text-center text-muted py-4">Loading...</div>';
+      Promise.all([
+        fetch('api/notifications-seller-approved.php').then(res => res.json()),
+        fetch('api/notifications-seller-delivered.php').then(res => res.json()),
+        fetch('api/notifications-seller-ecocoins.php').then(res => res.json())
+      ]).then(([approved, delivered, ecocoins]) => {
+        let hasAny = false;
+        body.innerHTML = '';
+        
+        // Log for debugging
+        console.log('Notifications received:', { approved, delivered, ecocoins });
+        
+        // Display EcoCoins section (highest priority) - always show
+        hasAny = true;  // Always show at least the EcoCoins section
+        body.innerHTML += '<div class="notification-section-title"><i class="fas fa-leaf me-2"></i>EcoCoins Earned</div>';
+        if (ecocoins.success && ecocoins.ecocoins && ecocoins.ecocoins.length > 0) {
+          ecocoins.ecocoins.forEach(function(notification) {
+            body.innerHTML += `
+              <a href='ecocoins.php' class='notification-sidebar-item' style='text-decoration:none;color:inherit;'>
+                <div class='notification-sidebar-icon' style='background: #fff3cd; color: #ffc107;'><i class='fas fa-leaf'></i></div>
+                <div class='notification-sidebar-content'>
+                  <div class='notification-sidebar-product'>${parseFloat(notification.ecocoins_earned).toFixed(2)} EcoCoins Earned!</div>
+                  <div class='notification-sidebar-status'>From ${notification.product_name}</div>
+                  <div class='notification-sidebar-date'>${new Date(notification.created_at).toLocaleDateString()}</div>
+                </div>
+                <div class='notification-sidebar-badge' style='background: #28bf4b; color: #fff; font-weight: bold;'>${parseFloat(notification.ecocoins_earned).toFixed(2)}</div>
+              </a>
+            `;
+          });
+        } else {
+          body.innerHTML += '<div class="text-muted small p-3"><i class="fas fa-info-circle me-2"></i>Earn EcoCoins when buyers receive their orders. Mark orders as delivered to earn rewards!</div>';
+        }
+        
+        // Display Product Approvals section
+        if (approved.success && approved.products.length > 0) {
+          hasAny = true;
+          body.innerHTML += '<div class="notification-section-title"><i class="fas fa-check-circle me-2"></i>Product Approvals</div>';
+          approved.products.forEach(function(product) {
+            body.innerHTML += `
+              <a href='seller-manageproducts.php?product_id=${encodeURIComponent(product.product_id)}' class='notification-sidebar-item' style='text-decoration:none;color:inherit;'>
+                <div class='notification-sidebar-icon'><i class='fas fa-check-circle'></i></div>
+                <div class='notification-sidebar-content'>
+                  <div class='notification-sidebar-product'>${product.name}</div>
+                  <div class='notification-sidebar-status'>Product approved by admin.</div>
+                  <div class='notification-sidebar-date'>${product.created_at}</div>
+                </div>
+              </a>
+            `;
+          });
+        }
+        
+        // Display Deliveries section
+        if (delivered.success && delivered.delivered.length > 0) {
+          hasAny = true;
+          body.innerHTML += '<div class="notification-section-title"><i class="fas fa-truck me-2"></i>Deliveries</div>';
+          delivered.delivered.forEach(function(item) {
+            body.innerHTML += `
+              <a href='seller-manageproducts.php?product_id=${encodeURIComponent(item.product_id)}' class='notification-sidebar-item' style='text-decoration:none;color:inherit;'>
+                <div class='notification-sidebar-icon'><i class='fas fa-truck'></i></div>
+                <div class='notification-sidebar-content'>
+                  <div class='notification-sidebar-product'>${item.name}</div>
+                  <div class='notification-sidebar-status'>Product delivered to buyer (Order #${item.order_id}).</div>
+                  <div class='notification-sidebar-date'>${item.delivered_at}</div>
+                </div>
+              </a>
+            `;
+          });
+        }
+        if (!hasAny) {
+          body.innerHTML = '<div class="text-center text-muted py-4">No notifications found.</div>';
+        }
+      }).catch((error) => {
+        console.error('Error loading notifications:', error);
+        body.innerHTML = '<div class="text-center text-danger py-4">Failed to load notifications.</div>';
+      });
+    });
+  }
+  // Close sidebar
+  if (closeBtn && sidebar) {
+    closeBtn.addEventListener('click', function() {
+      sidebar.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  }
+  // Close sidebar when clicking outside
+  document.addEventListener('mousedown', function(e) {
+    if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== openBtn) {
+      sidebar.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  });
+});
+// Sidebar toggle logic
+document.addEventListener('DOMContentLoaded', function() {
+  const menuToggle = document.getElementById('menuToggle');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+  const sidebarSlide = document.getElementById('sidebarSlide');
+  const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+
+  function openSidebar() {
+    sidebarOverlay.classList.add('active');
+    sidebarSlide.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSidebar() {
+    sidebarOverlay.classList.remove('active');
+    sidebarSlide.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  if(menuToggle) menuToggle.addEventListener('click', openSidebar);
+  if(sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+  if(sidebarCloseBtn) sidebarCloseBtn.addEventListener('click', closeSidebar);
+
+  // Improved profile dropdown logic
+  var profileImg = document.getElementById('profileDropdown');
+  var dropdownMenu = document.getElementById('profileDropdownMenu');
+  function closeDropdown() {
+    dropdownMenu.classList.remove('show');
+  }
+  function openDropdown() {
+    dropdownMenu.classList.add('show');
+  }
+  function toggleDropdown(e) {
+    e.preventDefault();
+    dropdownMenu.classList.toggle('show');
+  }
+  // For both click and touch
+  profileImg.addEventListener('click', toggleDropdown);
+  profileImg.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    toggleDropdown(e);
+  });
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(event) {
+    if (!profileImg.contains(event.target) && !dropdownMenu.contains(event.target)) {
+      closeDropdown();
+    }
+  });
+  // Keyboard accessibility
+  profileImg.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleDropdown(e);
+    }
+  });
+});
+</script>
+</body>
+</html>

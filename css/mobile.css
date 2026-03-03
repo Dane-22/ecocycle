@@ -1,0 +1,990 @@
+  /* Seller avatar: show only first letter, perfect circle, hide name/role in mobile */
+  .seller-profile > .seller-info,
+  .seller-profile > .seller-info > .seller-name,
+  .seller-profile > .seller-info > .seller-role,
+  #profileDropdownMenu .dropdown-item-text strong,
+  #profileDropdownMenu .dropdown-item-text,
+  #profileDropdownMenu .dropdown-item-text.text-muted.small,
+  .dropdown-menu .dropdown-item-text,
+  .dropdown-menu .dropdown-item-text.text-muted.small {
+    display: none !important;
+  }
+  .seller-profile .seller-avatar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.5rem !important;
+    width: 40px !important;
+    height: 40px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    background: #28a745 !important;
+    color: #fff !important;
+    font-weight: bold !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    line-height: 40px !important;
+    text-align: center !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+  }
+  /* Hide seller full name and role in mobile view, show only avatar */
+  .seller-profile > .seller-info,
+  .seller-profile > .seller-info > .seller-name,
+  .seller-profile > .seller-info > .seller-role,
+  #profileDropdownMenu .dropdown-item-text strong,
+  #profileDropdownMenu .dropdown-item-text,
+  #profileDropdownMenu .dropdown-item-text.text-muted.small {
+    display: none !important;
+  }
+/* Mobile-Specific Enhancements */
+/* Hide buyer full name in mobile view, show only avatar */
+@media (max-width: 576px) {
+  .seller-profile .seller-info {
+    display: none !important;
+  }
+  .buyer-profile > .buyer-info,
+  .buyer-profile > .buyer-info > .buyer-name,
+  .buyer-profile > .buyer-info > .buyer-role,
+  #profileDropdownMenu .dropdown-item-text strong,
+  #profileDropdownMenu .dropdown-item-text {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    background: #28a745 !important;
+    color: #fff !important;
+    font-weight: bold !important;
+    font-size: 1.5rem !important;
+    border: none !important;
+    margin: 0 auto 8px auto !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    line-height: 40px !important;
+    text-align: center !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+  }
+  #profileDropdownMenu .dropdown-item-text.text-muted.small {
+    display: none !important;
+  }
+  .buyer-profile {
+    align-items: center !important;
+    justify-content: center !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0 !important;
+      width: 40px !important;
+      height: 40px !important;
+      min-width: 40px !important;
+      min-height: 40px !important;
+      max-width: 40px !important;
+      max-height: 40px !important;
+      aspect-ratio: 1 / 1 !important;
+      border-radius: 50% !important;
+      background: transparent !important;
+      overflow: hidden !important;
+      position: relative !important;
+  }
+  .buyer-profile .buyer-avatar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.5rem !important;
+    width: 40px !important;
+    height: 40px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    background: #28a745 !important;
+    color: #fff !important;
+    font-weight: bold !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    line-height: 40px !important;
+    text-align: center !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+  }
+  .seller-profile .seller-info {
+    display: none !important;
+  }
+  .seller-profile {
+    align-items: center !important;
+    justify-content: center !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0 !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
+  .seller-profile {
+    align-items: center !important;
+    justify-content: center !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0 !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
+  .seller-profile .seller-avatar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.5rem !important;
+    width: 40px !important;
+    height: 40px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    background: #28a745 !important;
+    color: #fff !important;
+    font-weight: bold !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    line-height: 40px !important;
+    text-align: center !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* Mobile Navigation Bar */
+.mobile-nav-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid #dee2e6;
+  padding: 8px 0;
+  z-index: 1000;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 4px;
+  color: #6c757d;
+  text-decoration: none;
+  font-size: 0.75rem;
+  transition: color 0.3s ease;
+  min-height: 60px;
+  justify-content: center;
+}
+
+.mobile-nav-item.active {
+  color: #28a745;
+}
+
+.mobile-nav-item i {
+  font-size: 1.25rem;
+  margin-bottom: 4px;
+}
+
+/* Mobile Product Cards */
+.mobile-product-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  margin-bottom: 16px;
+}
+
+.mobile-product-card:active {
+  transform: scale(0.98);
+}
+
+.mobile-product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  background: #f8f9fa;
+}
+
+.mobile-product-info {
+  padding: 16px;
+}
+
+.mobile-product-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #212529;
+  line-height: 1.3;
+}
+
+.mobile-product-price {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #28a745;
+  margin-bottom: 12px;
+}
+
+.mobile-product-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.mobile-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.3s ease;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-btn-primary {
+  background: #28a745;
+  color: white;
+}
+
+.mobile-btn-primary:active {
+  background: #218838;
+  transform: scale(0.98);
+}
+
+.mobile-btn-outline {
+  background: transparent;
+  color: #28a745;
+  border: 1px solid #28a745;
+}
+
+.mobile-btn-outline:active {
+  background: #28a745;
+  color: white;
+  transform: scale(0.98);
+}
+
+/* Mobile Search Bar */
+.mobile-search-container {
+  position: relative;
+  margin: 16px 0;
+}
+
+.mobile-search-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #dee2e6;
+  border-radius: 25px;
+  font-size: 16px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.mobile-search-input:focus {
+  outline: none;
+  border-color: #28a745;
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+.mobile-search-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Mobile Category Pills */
+.mobile-category-pills {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 16px 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.mobile-category-pills::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-category-pill {
+  background: #f8f9fa;
+  color: #6c757d;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #dee2e6;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.mobile-category-pill.active {
+  background: #28a745;
+  color: white;
+  border-color: #28a745;
+}
+
+/* Mobile Modal Enhancements */
+.mobile-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.mobile-modal-content {
+  background: #fff;
+  border-radius: 16px;
+  max-width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.mobile-modal-header {
+  padding: 20px 20px 0;
+  border-bottom: 1px solid #dee2e6;
+  margin-bottom: 20px;
+}
+
+.mobile-modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #212529;
+  margin: 0;
+}
+
+.mobile-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6c757d;
+  padding: 4px;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-modal-body {
+  padding: 0 20px 20px;
+}
+
+/* Mobile Form Elements */
+.mobile-form-group {
+  margin-bottom: 20px;
+}
+
+.mobile-form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #212529;
+  font-size: 0.95rem;
+}
+
+.mobile-form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 16px;
+  background: #fff;
+  transition: border-color 0.3s ease;
+}
+
+.mobile-form-input:focus {
+  outline: none;
+  border-color: #28a745;
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+.mobile-form-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 16px;
+  background: #fff;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+/* Mobile Loading States */
+.mobile-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #6c757d;
+}
+
+.mobile-loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #28a745;
+  border-radius: 50%;
+  animation: mobile-spin 1s linear infinite;
+  margin-right: 12px;
+}
+
+@keyframes mobile-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Mobile Empty States */
+.mobile-empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+}
+
+.mobile-empty-icon {
+  /* Shopee-style two-column product grid for mobile */
+  .product-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+  .product-card {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 8px !important;
+    box-sizing: border-box !important;
+  }
+  .product-card img {
+    max-height: 120px !important;
+    width: 100% !important;
+    object-fit: contain !important;
+  }
+  font-size: 3rem;
+  margin-bottom: 16px;
+  color: #dee2e6;
+}
+
+.mobile-empty-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #495057;
+}
+
+.mobile-empty-description {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* Mobile Pull to Refresh */
+.mobile-pull-indicator {
+  text-align: center;
+  padding: 16px;
+  color: #6c757d;
+  font-size: 0.9rem;
+  display: none;
+}
+
+.mobile-pull-indicator.show {
+  display: block;
+}
+
+.mobile-pull-icon {
+  animation: mobile-pull 1s ease-in-out infinite;
+}
+
+@keyframes mobile-pull {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Mobile Swipe Actions */
+.mobile-swipe-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.mobile-swipe-actions {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  background: #dc3545;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.mobile-swipe-action {
+  padding: 16px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  border-left: 1px solid rgba(255,255,255,0.2);
+}
+
+.mobile-swipe-container.swiped .mobile-swipe-actions {
+  transform: translateX(0);
+}
+
+/* Mobile Toast Notifications */
+.mobile-toast {
+  position: fixed;
+  top: 20px;
+  left: 16px;
+  right: 16px;
+  background: #212529;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  z-index: 1200;
+  transform: translateY(-100px);
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.mobile-toast.show {
+  transform: translateY(0);
+}
+
+.mobile-toast.success {
+  background: #28a745;
+}
+
+.mobile-toast.error {
+  background: #dc3545;
+}
+
+.mobile-toast.warning {
+  background: #ffc107;
+  color: #212529;
+}
+
+/* Mobile Image Gallery */
+.mobile-gallery {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 16px 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.mobile-gallery::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-gallery-item {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.mobile-gallery-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Mobile Responsive Utilities */
+@media (max-width: 480px) {
+  .mobile-product-image {
+    height: 180px;
+  }
+  
+  .mobile-product-info {
+    padding: 12px;
+  }
+  
+  .buyer-profile .buyer-info {
+    display: none !important;
+  }
+  .buyer-profile .buyer-name {
+    font-size: 0.95rem;
+  }
+
+  .mobile-product-price {
+    font-size: 1rem;
+  }
+  
+  .mobile-btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+  
+  .mobile-category-pill {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+  
+  .mobile-modal-content {
+    margin: 8px;
+    max-height: 95vh;
+  }
+  
+  .mobile-modal-header {
+    padding: 16px 16px 0;
+  }
+  
+  .mobile-modal-body {
+    padding: 0 16px 16px;
+  }
+
+
+/* Mobile Landscape Adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  .mobile-nav-bar {
+    display: none;
+  }
+  
+  .mobile-modal-content {
+    max-height: 80vh;
+  }
+  
+  .mobile-product-image {
+    height: 120px;
+  }
+}
+
+/* Mobile Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .mobile-nav-bar {
+    background: #2d3748;
+    border-top-color: #4a5568;
+  }
+  
+  .mobile-nav-item {
+    color: #a0aec0;
+  }
+  
+  .mobile-nav-item.active {
+    color: #68d391;
+  }
+  
+  .mobile-product-card {
+    background: #4a5568;
+  }
+  
+  .mobile-product-title {
+    color: #e2e8f0;
+  }
+  
+  .mobile-search-input {
+    background: #4a5568;
+    border-color: #718096;
+    color: #e2e8f0;
+  }
+  
+  .mobile-category-pill {
+    background: #4a5568;
+    color: #e2e8f0;
+    border-color: #718096;
+  }
+  
+  .mobile-category-pill.active {
+    background: #38a169;
+    border-color: #38a169;
+  }
+  
+  .mobile-modal-content {
+    background: #4a5568;
+  }
+  
+  .mobile-modal-title {
+    color: #e2e8f0;
+  }
+  
+  .mobile-form-input,
+  .mobile-form-select {
+    background: #4a5568;
+    border-color: #718096;
+    color: #e2e8f0;
+  }
+  
+  .mobile-empty-state {
+    color: #a0aec0;
+  }
+  
+  .mobile-empty-title {
+    color: #e2e8f0;
+  }
+}
+
+/* Mobile High Contrast Mode */
+@media (prefers-contrast: high) {
+  .mobile-product-card {
+    border: 2px solid #000;
+  }
+  
+  .mobile-btn {
+    border: 2px solid currentColor;
+  }
+  
+  .mobile-search-input {
+    border: 2px solid #000;
+  }
+  
+  .mobile-category-pill {
+    border: 2px solid #000;
+  }
+}
+
+/* Mobile Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-product-card,
+  .mobile-btn,
+  .mobile-category-pill,
+  .mobile-swipe-actions,
+  .mobile-toast {
+    transition: none;
+  }
+  
+  .mobile-loading-spinner {
+    animation: none;
+  }
+  
+  .mobile-pull-icon {
+    animation: none;
+  }
+} 
+/* Ensure buyer profile button displays full name and role in mobile view */
+@media (max-width: 576px) {
+  .seller-profile {
+    align-items: center !important;
+    justify-content: center !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0 !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
+  .seller-profile .seller-avatar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.5rem !important;
+    width: 40px !important;
+    height: 40px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    background: #28a745 !important;
+    color: #fff !important;
+    font-weight: bold !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    line-height: 40px !important;
+    text-align: center !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+  }
+  /* Two-column product grid for mobile view */
+  .product-grid, .product-list, .products-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+  .product-card {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 8px !important;
+    font-size: 0.85rem !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .product-card .card-title {
+    font-size: 1rem !important;
+  }
+  .product-card .card-text,
+  .product-card .badge,
+  .product-card .btn,
+  .product-card .fw-bold {
+    font-size: 0.85rem !important;
+  }
+  .product-card img {
+    max-height: 120px !important;
+  }
+
+  /* Two-column product grid for mobile */
+  .product-list-mobile {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+  .product-card {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .product-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .product-card {
+    width: 100%;
+    margin: 0;
+    padding: 8px;
+    font-size: 0.85rem;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .product-card img {
+    max-height: 120px;
+  }
+}
+/* Show only image, title, price, ecocoins price, and stock for product cards in mobile view, and adjust card width */
+@media (max-width: 576px) {
+  .product-card {
+    width: 98% !important;
+    margin: 0 auto 8px auto !important;
+    padding: 8px !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+  }
+  .product-card .card-text,
+  .product-card .mt-auto,
+  .product-card .d-flex.justify-content-between,
+  .product-card .btn,
+  .product-card .badge.bg-light.text-dark {
+    display: none !important;
+  }
+  .product-card .card-title,
+  .product-card .fw-bold,
+  .product-card .stock-label,
+  .product-card img {
+    display: block !important;
+  }
+  .product-card img {
+    max-height: 120px !important;
+    width: 100% !important;
+    object-fit: contain !important;
+    margin-bottom: 8px !important;
+  }
+  .product-card .card-title {
+     font-size: 0.65rem !important;
+    margin-bottom: 4px !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+    white-space: normal !important;
+  }
+  .product-card .fw-bold {
+    font-size: 1rem !important;
+    color: #28a745 !important;
+    text-align: center !important;
+    margin-bottom: 4px !important;
+  }
+  .product-card .stock-label {
+    font-size: 0.85rem !important;
+    text-align: center !important;
+    margin-bottom: 4px !important;
+    display: block !important;
+    }
+  }
+}
