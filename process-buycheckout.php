@@ -51,7 +51,7 @@ if ($product_id <= 0 || $quantity <= 0 || empty($shipping_address)) {
     exit();
 }
 
-$stmt = $pdo->prepare('SELECT product_id, price, stock_quantity FROM Products WHERE product_id = ?');
+$stmt = $pdo->prepare('SELECT product_id, price, stock_quantity FROM products WHERE product_id = ?');
 $stmt->execute([$product_id]);
 $product = $stmt->fetch();
 
@@ -71,7 +71,7 @@ if ($payment_method === 'ecocoins') {
     $ecocoins_required = $order_total / 10;
     
     // Fetch user's current EcoCoins balance
-    $stmt = $pdo->prepare('SELECT ecocoins_balance FROM Buyers WHERE buyer_id = ?');
+    $stmt = $pdo->prepare('SELECT ecocoins_balance FROM buyers WHERE buyer_id = ?');
     $stmt->execute([$_SESSION['user_id']]);
     $buyer = $stmt->fetch();
     $user_balance = $buyer ? (float)$buyer['ecocoins_balance'] : 0;
@@ -84,7 +84,7 @@ if ($payment_method === 'ecocoins') {
 }
 
 // Insert order
-$stmt = $pdo->prepare('INSERT INTO Orders (buyer_id, shipping_address, payment_method, total_amount, status, created_at) VALUES (?, ?, ?, ?, ?, NOW())');
+$stmt = $pdo->prepare('INSERT INTO orders (buyer_id, shipping_address, payment_method, total_amount, status, created_at) VALUES (?, ?, ?, ?, ?, NOW())');
 $stmt->execute([
     $_SESSION['user_id'],
     $shipping_address,
@@ -95,7 +95,7 @@ $stmt->execute([
 $order_id = $pdo->lastInsertId();
 
 // Insert order item
-$stmt = $pdo->prepare('INSERT INTO Order_Items (order_id, product_id, quantity, price, payment_receipt) VALUES (?, ?, ?, ?, ?)');
+$stmt = $pdo->prepare('INSERT INTO order_items (order_id, product_id, quantity, price, payment_receipt) VALUES (?, ?, ?, ?, ?)');
 $stmt->execute([
     $order_id,
     $product_id,
@@ -105,7 +105,7 @@ $stmt->execute([
 ]);
 
 // Update product stock
-$stmt = $pdo->prepare('UPDATE Products SET stock_quantity = stock_quantity - ? WHERE product_id = ?');
+$stmt = $pdo->prepare('UPDATE products SET stock_quantity = stock_quantity - ? WHERE product_id = ?');
 $stmt->execute([$quantity, $product_id]);
 
 // Award EcoCoins for purchase (1 EcoCoin per 100 pesos spent, decimals allowed)
@@ -114,7 +114,7 @@ $ecocoins_awarded = round($total_price / 100, 2);
 // Deduct EcoCoins if payment method is EcoCoins
 if ($payment_method === 'ecocoins') {
     $ecocoins_required = $order_total / 10;
-    $stmt = $pdo->prepare('UPDATE Buyers SET ecocoins_balance = ecocoins_balance - ? WHERE buyer_id = ?');
+    $stmt = $pdo->prepare('UPDATE buyers SET ecocoins_balance = ecocoins_balance - ? WHERE buyer_id = ?');
     $stmt->execute([$ecocoins_required, $_SESSION['user_id']]);
     
     // Try to log transaction (with order_id if column exists)
@@ -129,7 +129,7 @@ if ($payment_method === 'ecocoins') {
 }
 
 // Award EcoCoins from purchase (separate from payment EcoCoins)
-$stmt = $pdo->prepare('UPDATE Buyers SET ecocoins_balance = ecocoins_balance + ? WHERE buyer_id = ?');
+$stmt = $pdo->prepare('UPDATE buyers SET ecocoins_balance = ecocoins_balance + ? WHERE buyer_id = ?');
 $stmt->execute([$ecocoins_awarded, $_SESSION['user_id']]);
 
 // Show SweetAlert and redirect with proper HTML structure
