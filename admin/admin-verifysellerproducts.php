@@ -74,7 +74,7 @@ sort($sellers);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Verify Seller Products</title>
+    <title>Verify Seller products</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -405,7 +405,7 @@ sort($sellers);
   }
 </style>
 <div class="main-content">
-    <h2>Pending Seller Products</h2>
+    <h2>Pending Seller products</h2>
     <div class="container users-fixed-panel" style="padding-top:40px;">
       <div class="mb-3">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
@@ -415,13 +415,13 @@ sort($sellers);
               <button class="btn btn-search btn-enhanced" type="submit"><i class="fas fa-search"></i></button>
             </div>
             <select class="form-select" style="max-width: 180px;" name="filter_category" onchange="this.form.submit()">
-              <option value="">All Categories</option>
+              <option value="">All categories</option>
               <?php foreach ($categories as $cat): ?>
                 <option value="<?= htmlspecialchars($cat) ?>"<?= $filter_category === $cat ? ' selected' : '' ?>><?= htmlspecialchars($cat) ?></option>
               <?php endforeach; ?>
             </select>
             <select class="form-select" style="max-width: 180px;" name="filter_seller" onchange="this.form.submit()">
-              <option value="">All Sellers</option>
+              <option value="">All sellers</option>
               <?php foreach ($sellers as $seller): ?>
                 <option value="<?= htmlspecialchars($seller) ?>"<?= $filter_seller === $seller ? ' selected' : '' ?>><?= htmlspecialchars($seller) ?></option>
               <?php endforeach; ?>
