@@ -44,7 +44,7 @@ $_SESSION['last_activity'] = time();
 // Additional security: Check if admin account still exists and is active
 try {
     require_once 'database.php';
-    $stmt = $pdo->prepare("SELECT admin_id, status FROM Admins WHERE admin_id = ? AND status = 'active'");
+    $stmt = $pdo->prepare("SELECT admin_id, status FROM admins WHERE admin_id = ? AND status = 'active'");
     $stmt->execute([$_SESSION['user_id']]);
     $admin = $stmt->fetch();
     if (!$admin) {
