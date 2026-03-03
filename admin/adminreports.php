@@ -103,7 +103,7 @@ foreach ($shareorders as $item) {
 			}
 		}
 	</style>
-	<title>Admins Reports</title>
+	<title>admins Reports</title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -113,7 +113,7 @@ foreach ($shareorders as $item) {
 	<div class="container mt-4" style="margin-left:300px; max-width:1200px; width:100%;">
 		<div id="full-report-content">
 		<div class="d-flex justify-content-between align-items-center mb-4">
-			<h2 class="fw-bold mb-0">Admins Reports</h2>
+			<h2 class="fw-bold mb-0">admins Reports</h2>
 			<button class="btn btn-success" onclick="printFullReport()" title="Print Report">
 				<i class="fas fa-print"></i> Print Report
 			</button>
@@ -135,15 +135,15 @@ foreach ($shareorders as $item) {
 				<table class="table table-bordered table-striped mb-0">
 					<tbody>
 						<tr>
-							<th>Bard Admins Share (5%)</th>
+							<th>Bard admins Share (5%)</th>
 							<td>₱<?php echo number_format($bardShare, 2); ?></td>
 						</tr>
 						<tr>
-							<th>Admins Share (10%)</th>
+							<th>admins Share (10%)</th>
 							<td>₱<?php echo number_format($adminShare, 2); ?></td>
 						</tr>
 						<tr>
-							<th>Sellers Share (85%)</th>
+							<th>sellers Share (85%)</th>
 							<td>₱<?php echo number_format($sellerShare, 2); ?></td>
 						</tr>
 						<tr>
@@ -166,8 +166,8 @@ foreach ($shareorders as $item) {
 						<tr>
 							<th>Month</th>
 							<th>Bard Share</th>
-							<th>Admins Share</th>
-							<th>Sellers Share</th>
+							<th>admins Share</th>
+							<th>sellers Share</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -195,8 +195,8 @@ foreach ($shareorders as $item) {
 						<tr>
 							<th>Date</th>
 							<th>Bard Share</th>
-							<th>Admins Share</th>
-							<th>Sellers Share</th>
+							<th>admins Share</th>
+							<th>sellers Share</th>
 						</tr>
 					</thead>
 					<tbody>
