@@ -49,7 +49,6 @@ try {
     $order_sql_error = $e->getMessage();
 }
 
-
 // Sort all notifications by date desc
 usort($notifications, function($a, $b) {
     return strtotime($b['date']) - strtotime($a['date']);
