@@ -24,7 +24,7 @@ echo 'Expires: ' . htmlspecialchars($expires) . '<br>';
 // Test 3: Save to database
 echo '<h3>Saving to Database</h3>';
 try {
-    $stmt = $pdo->prepare("UPDATE Buyers SET reset_token = ?, reset_token_expires = ? WHERE buyer_id = 2");
+    $stmt = $pdo->prepare("UPDATE buyers SET reset_token = ?, reset_token_expires = ? WHERE buyer_id = 2");
     $stmt->execute([$test_token, $expires]);
     echo '<p style="color: green;">✓ Token saved</p>';
 } catch (Exception $e) {
@@ -34,11 +34,11 @@ try {
 // Test 4: Test the exact query
 echo '<h3>Testing Query</h3>';
 try {
-    $stmt = $pdo->prepare("SELECT * FROM Buyers WHERE reset_token = ? AND reset_token_expires > NOW()");
+    $stmt = $pdo->prepare("SELECT * FROM buyers WHERE reset_token = ? AND reset_token_expires > NOW()");
     $stmt->execute([$test_token]);
     $user = $stmt->fetch();
     
-    echo 'Query: SELECT * FROM Buyers WHERE reset_token = ? AND reset_token_expires > NOW()<br>';
+    echo 'Query: SELECT * FROM buyers WHERE reset_token = ? AND reset_token_expires > NOW()<br>';
     echo 'Results: ' . ($user ? 'FOUND' : 'NOT FOUND') . '<br>';
     
     if ($user) {
@@ -48,7 +48,7 @@ try {
     
     // Test without time comparison
     echo '<h4>Without Time Check:</h4>';
-    $stmt2 = $pdo->prepare("SELECT * FROM Buyers WHERE reset_token = ?");
+    $stmt2 = $pdo->prepare("SELECT * FROM buyers WHERE reset_token = ?");
     $stmt2->execute([$test_token]);
     $user2 = $stmt2->fetch();
     echo 'Results without time: ' . ($user2 ? 'FOUND' : 'NOT FOUND') . '<br>';
@@ -65,7 +65,7 @@ echo '<small>This should work for 2 hours</small>';
 
 // Test 6: Show current tokens in database
 echo '<h3>Current Tokens in Database</h3>';
-$stmt = $pdo->query("SELECT buyer_id, email, reset_token, reset_token_expires FROM Buyers WHERE reset_token IS NOT NULL");
+$stmt = $pdo->query("SELECT buyer_id, email, reset_token, reset_token_expires FROM buyers WHERE reset_token IS NOT NULL");
 while ($row = $stmt->fetch()) {
     $is_expired = strtotime($row['reset_token_expires']) < time();
     echo 'ID: ' . $row['buyer_id'] . ', Email: ' . htmlspecialchars($row['email']) . ', Expires: ' . htmlspecialchars($row['reset_token_expires']) . ' (' . ($is_expired ? 'EXPIRED' : 'VALID') . ')<br>';
