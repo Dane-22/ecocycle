@@ -40,10 +40,10 @@ try {
   } else {
     $stmt->execute();
   }
-  $redeemedProducts = $stmt->fetchAll();
+  $redeemedproducts = $stmt->fetchAll();
 } catch (PDOException $e) {
   error_log("BARD Dashboard Query Error: " . $e->getMessage());
-  $redeemedProducts = [];
+  $redeemedproducts = [];
 }
 
 // Fetch all paid orders for shares income only with optional date filter
@@ -64,7 +64,7 @@ if ($applyFilter) {
 } else {
   $stmt->execute();
 }
-$shareOrders = $stmt->fetchAll();
+$shareorders = $stmt->fetchAll();
 
 // Calculate statistics
 // Calculate shares income (5% per transaction)
@@ -72,18 +72,18 @@ $shareOrders = $stmt->fetchAll();
 
 // Shares income: 5% from all paid orders
 $sharesIncome = 0;
-foreach ($shareOrders as $item) {
+foreach ($shareorders as $item) {
   $sharesIncome += $item['amount_paid'] * 0.05;
 }
 
 // Other cards: stats from redeem transactions only
-$totalRedeemed = count($redeemedProducts);
+$totalRedeemed = count($redeemedproducts);
 $totalEcocoinsUsed = 0;
 $completedRedeemed = 0;
 $pendingRedeemed = 0;
 $processingRedeemed = 0;
 $userNames = [];
-foreach ($redeemedProducts as $item) {
+foreach ($redeemedproducts as $item) {
   $totalEcocoinsUsed += $item['ecocoins_used'];
   $userNames[] = $item['user_name'];
   if (strtolower($item['status']) == 'confirmed' || strtolower($item['status']) == 'delivered' || strtolower($item['status']) == 'redeemed') {
@@ -341,7 +341,7 @@ $uniqueUsers = count(array_unique($userNames));
           <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
               <div>
-                <h2 class="fw-bold mb-1 text-dark">Welcome back, Bard Admin!</h2>
+                <h2 class="fw-bold mb-1 text-dark">Welcome back, Bard admins!</h2>
                 <p class="text-muted mb-0 fs-6">Here's what's happening with your store today.</p>
               </div>
             </div>
@@ -376,7 +376,7 @@ $uniqueUsers = count(array_unique($userNames));
                 <h6 class="card-title text-muted mb-2 fw-semibold">Shares Income</h6>
                 <p class="card-text h4 fw-bold text-info mb-1">₱<?php echo number_format($sharesIncome, 2); ?></p>
                 <small class="text-info fw-medium">
-                  <i class="fas fa-chart-line me-1"></i>5% from seller sales
+                  <i class="fas fa-chart-line me-1"></i>5% from sellers sales
                 </small>
               </div>
             </div>
@@ -391,7 +391,7 @@ $uniqueUsers = count(array_unique($userNames));
                 <h6 class="card-title text-muted mb-2 fw-semibold">Total Redeemed</h6>
                 <p class="card-text h4 fw-bold text-success mb-1"><?php echo number_format($totalRedeemed); ?></p>
                 <small class="text-success fw-medium">
-                  <i class="fas fa-check-circle me-1"></i>Products redeemed
+                  <i class="fas fa-check-circle me-1"></i>products redeemed
                 </small>
               </div>
             </div>
@@ -692,7 +692,7 @@ $uniqueUsers = count(array_unique($userNames));
           }
           
           // Query shares income with date filter
-          foreach ($shareOrders as $item) {
+          foreach ($shareorders as $item) {
             $date = $item['order_date'];
             if (isset($sharesIncomeArray[$date])) {
               $sharesIncomeArray[$date] += $item['amount_paid'] * 0.05;
@@ -709,7 +709,7 @@ $uniqueUsers = count(array_unique($userNames));
           }
           
           // Aggregate shares income by month
-          foreach ($shareOrders as $item) {
+          foreach ($shareorders as $item) {
             $month = date('Y-m', strtotime($item['order_date']));
             if (isset($sharesIncomeArray[$month])) {
               $sharesIncomeArray[$month] += $item['amount_paid'] * 0.05;
